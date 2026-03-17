@@ -28,25 +28,25 @@
 	function getQuadBackground(index: number): string {
 		if (data.quadrant === index) return `${compass.accent}18`;
 		if (constraints.conflicts[index]) return HATCH;
-		return 'rgba(255,255,255,0.02)';
+		return 'var(--surface)';
 	}
 
 	function getQuadBorder(index: number): string {
 		if (data.quadrant === index) return `1px solid ${compass.accent}55`;
-		if (constraints.conflicts[index]) return '1px solid rgba(255,255,255,0.04)';
-		return '1px solid rgba(255,255,255,0.06)';
+		if (constraints.conflicts[index]) return '1px solid var(--border-subtle)';
+		return '1px solid var(--border)';
 	}
 
 	function getLabelColor(index: number): string {
 		if (data.quadrant === index) return compass.accent;
-		if (constraints.conflicts[index]) return '#666';
-		return '#bbb';
+		if (constraints.conflicts[index]) return 'var(--text-faint)';
+		return 'var(--text-secondary)';
 	}
 
 	function getDescColor(index: number): string {
 		if (data.quadrant === index) return '#ddd';
-		if (constraints.conflicts[index]) return '#555';
-		return '#888';
+		if (constraints.conflicts[index]) return 'var(--text-faint)';
+		return 'var(--text-dim)';
 	}
 </script>
 
@@ -63,6 +63,8 @@
 					style:background={getQuadBackground(i)}
 					style:border={getQuadBorder(i)}
 					class="quad-button"
+					class:selected={data.quadrant === i}
+					class:conflicted={constraints.conflicts[i]}
 				>
 					<div class="quad-label" style:color={getLabelColor(i)} style:font-weight={data.quadrant === i ? 'bold' : 'normal'}>
 						{quad.label}
@@ -102,9 +104,9 @@
 				{#each INTENSITY_LABELS as label, idx}
 					<button
 						onclick={() => onChange({ ...data, intensity: idx as 0 | 1 | 2 })}
-						style:border={data.intensity === idx ? `1px solid ${compass.accent}` : '1px solid rgba(255,255,255,0.12)'}
+						style:border={data.intensity === idx ? `1px solid ${compass.accent}` : '1px solid var(--border-interactive)'}
 						style:background={data.intensity === idx ? `${compass.accent}22` : 'transparent'}
-						style:color={data.intensity === idx ? compass.accent : '#999'}
+						style:color={data.intensity === idx ? compass.accent : 'var(--text-muted)'}
 						class="intensity-btn"
 					>
 						{label}
@@ -127,7 +129,7 @@
 		font-size: 10px;
 		text-transform: uppercase;
 		letter-spacing: 2px;
-		color: #999;
+		color: var(--text-muted);
 		text-align: center;
 	}
 
@@ -140,6 +142,7 @@
 		display: flex;
 		align-items: center;
 		gap: 12px;
+		justify-content: center;
 	}
 
 	.axis-left {
@@ -162,12 +165,16 @@
 	}
 
 	.quad-button {
-		border-radius: 8px;
+		border-radius: var(--radius-sm);
 		padding: 16px 12px;
 		cursor: pointer;
 		text-align: left;
-		transition: all 0.3s ease;
-		outline: none;
+		transition: all 0.2s ease;
+	}
+
+	.quad-button:not(.selected):not(.conflicted):hover {
+		border-color: var(--border-interactive) !important;
+		background: rgba(255, 255, 255, 0.04) !important;
 	}
 
 	.quad-label {
@@ -194,7 +201,7 @@
 	.reason {
 		font-family: var(--mono);
 		font-size: 10px;
-		color: #777;
+		color: var(--text-dim);
 		display: flex;
 		align-items: center;
 		gap: 6px;
@@ -208,7 +215,7 @@
 	}
 
 	.reason-dim {
-		color: #999;
+		color: var(--text-muted);
 	}
 
 	.intensity {
@@ -224,7 +231,7 @@
 		font-size: 10px;
 		text-transform: uppercase;
 		letter-spacing: 3px;
-		color: #999;
+		color: var(--text-muted);
 	}
 
 	.intensity-buttons {
@@ -238,9 +245,13 @@
 		text-transform: uppercase;
 		letter-spacing: 2px;
 		padding: 6px 14px;
-		border-radius: 12px;
+		border-radius: var(--radius-md);
 		cursor: pointer;
 		transition: all 0.2s ease;
-		outline: none;
 	}
+
+	.intensity-btn:hover {
+		border-color: var(--border-hover) !important;
+	}
+
 </style>

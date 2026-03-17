@@ -28,7 +28,7 @@
 			></div>
 
 			<div class="header-text">
-				<div class="title" style:color={expanded ? compass.accent : '#f0f0f0'}>
+				<div class="title" style:color={expanded ? compass.accent : 'var(--text)'}>
 					{compass.title}
 				</div>
 				<div class="subtitle">{compass.subtitle}</div>
@@ -59,13 +59,6 @@
 					onChange={(d) => onchange(compass.id, d)}
 				/>
 
-				<textarea
-					value={data.notes}
-					oninput={(e) => onchange(compass.id, { notes: (e.target as HTMLTextAreaElement).value })}
-					placeholder="Your explanation — how these two dimensions interact for you..."
-					class="notes"
-				></textarea>
-
 				{#if compass.informs}
 					<div class="informs" style:border-left-color={compass.accent} style:background="{compass.accent}0f">
 						<div class="informs-label">This informs how I relate to</div>
@@ -80,13 +73,13 @@
 <style>
 	.card {
 		background: transparent;
-		border-radius: 16px;
+		border-radius: var(--radius-lg);
 		transition: background 0.4s ease;
 		margin-bottom: 8px;
 	}
 
 	.card.expanded {
-		background: rgba(255, 255, 255, 0.015);
+		background: var(--surface);
 	}
 
 	.card-header {
@@ -99,7 +92,12 @@
 		border: none;
 		cursor: pointer;
 		text-align: left;
-		outline: none;
+		border-radius: var(--radius-lg);
+		transition: background 0.2s ease;
+	}
+
+	.card-header:hover {
+		background: var(--surface);
 	}
 
 	.indicator {
@@ -123,7 +121,7 @@
 	.subtitle {
 		font-family: var(--mono);
 		font-size: 11px;
-		color: #777;
+		color: var(--text-dim);
 		margin-top: 2px;
 	}
 
@@ -132,11 +130,11 @@
 		font-size: 10px;
 		text-transform: uppercase;
 		letter-spacing: 3px;
-		color: #555;
+		color: var(--text-faint);
 	}
 
 	.toggle {
-		color: #777;
+		color: var(--text-dim);
 		font-size: 18px;
 		transition: transform 0.3s ease;
 	}
@@ -157,7 +155,7 @@
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		gap: 16px;
-		border-top: 1px solid rgba(255, 255, 255, 0.06);
+		border-top: 1px solid var(--border);
 		padding-top: 16px;
 	}
 
@@ -166,46 +164,26 @@
 		font-size: 10px;
 		text-transform: uppercase;
 		letter-spacing: 3px;
-		color: #777;
+		color: var(--text-dim);
 		margin-bottom: 4px;
 	}
 
 	.axis-name {
 		font-family: var(--mono);
 		font-size: 12px;
-		color: #bbb;
+		color: var(--text-secondary);
 	}
 
 	.axis-range {
 		font-family: var(--mono);
 		font-size: 10px;
-		color: #777;
+		color: var(--text-dim);
 		margin-top: 2px;
-	}
-
-	.notes {
-		width: 100%;
-		min-height: 100px;
-		background: rgba(255, 255, 255, 0.02);
-		border: 1px solid rgba(255, 255, 255, 0.06);
-		border-radius: 8px;
-		padding: 14px;
-		color: #bbb;
-		font-family: var(--mono);
-		font-size: 12px;
-		line-height: 1.7;
-		resize: vertical;
-		outline: none;
-		box-sizing: border-box;
-	}
-
-	.notes:focus {
-		border-color: rgba(255, 255, 255, 0.2);
 	}
 
 	.informs {
 		border-left: 2px solid;
-		border-radius: 0 6px 6px 0;
+		border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
 		padding: 12px 16px;
 	}
 
@@ -214,14 +192,14 @@
 		font-size: 10px;
 		text-transform: uppercase;
 		letter-spacing: 3px;
-		color: #999;
+		color: var(--text-muted);
 		margin-bottom: 6px;
 	}
 
 	.informs-text {
 		font-family: var(--mono);
 		font-size: 12px;
-		color: #bbb;
+		color: var(--text-secondary);
 		line-height: 1.6;
 	}
 </style>
