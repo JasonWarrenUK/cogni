@@ -45,6 +45,22 @@ export interface Alternative {
 	relevant: string[];
 }
 
+export interface GrowthPath {
+	/** Quadrant index that triggers this path */
+	quadrant: number;
+	/** A bridging practice to try first */
+	bridge: string;
+	/** Why this bridge works for their cognitive style */
+	rationale: string;
+	/** 2-3 concrete actions */
+	steps: string[];
+}
+
+export interface MethodGrowthPaths {
+	/** Compass ID → growth paths keyed by friction quadrant */
+	[compassId: string]: GrowthPath[];
+}
+
 export interface Source {
 	author: string;
 	work: string;
@@ -59,6 +75,8 @@ export interface Method {
 	evaluators: Record<string, MethodEvaluator>;
 	alternatives: Alternative[];
 	sources: Source[];
+	growthPaths?: MethodGrowthPaths;
+	contextModifiers?: ContextModifier[];
 }
 
 export interface EvalResult {
@@ -67,13 +85,27 @@ export interface EvalResult {
 	fit: 'natural' | 'adapt' | 'friction';
 	text: string;
 	quadrant: number;
+	weight: number;
 }
+
+export type ConfidenceLevel = 'high' | 'medium' | 'low';
 
 export interface MethodEvaluation {
 	overall: FitLevel;
 	evals: EvalResult[];
 	positioned: number;
 	total: number;
+	score: number;
+	confidence: ConfidenceLevel;
+}
+
+export interface ScoredAlternative {
+	name: string;
+	desc: string;
+	relevant: string[];
+	score: number;
+	matchCount: number;
+	totalRefs: number;
 }
 
 export interface ConstraintReason {
@@ -88,6 +120,13 @@ export interface Constraints {
 	reasons: ConstraintReason[];
 }
 
+export interface UserReference {
+	author: string;
+	work: string;
+	year?: number;
+	note: string;
+}
+
 export interface ProfileExport {
 	exportedAt: string;
 	version: string;
@@ -100,6 +139,7 @@ export interface ProfileExport {
 	}>;
 	growth: { developing: string; questions: string };
 	references: string;
+	structuredReferences?: UserReference[];
 }
 
 export interface FitMeta {
@@ -107,4 +147,41 @@ export interface FitMeta {
 	color: string;
 	bg: string;
 	border: string;
+}
+
+export type InteractionType = 'synergy' | 'tension' | 'redundancy';
+
+export interface MethodInteraction {
+	methods: [string, string];
+	type: InteractionType;
+	/** Optional condition: only show when this compass+quadrant is active */
+	condition?: string; // format: "compassId-quadrant"
+	text: string;
+}
+
+export type ProjectPhase = 'greenfield' | 'legacy' | 'research' | 'maintenance';
+export type TeamSize = 'solo' | 'small' | 'large';
+
+export interface ProjectContext {
+	phase: ProjectPhase | null;
+	teamSize: TeamSize | null;
+}
+
+/** A modifier shifts fit score for a specific compass+quadrant given a context. */
+export interface ContextModifier {
+	phase?: ProjectPhase;
+	teamSize?: TeamSize;
+	/** Compass ID + quadrant that this modifier applies to */
+	compassId: string;
+	quadrant: number;
+	/** Score delta: positive = more natural, negative = more friction */
+	delta: number;
+	/** Short explanation shown in UI */
+	note: string;
+}
+
+export interface ResolvedInteraction {
+	type: InteractionType;
+	text: string;
+	methodNames: [string, string];
 }
