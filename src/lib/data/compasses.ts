@@ -329,12 +329,12 @@ export const COMPASSES: Compass[] = [
 			high: 'High — need incubation',
 		},
 		quads: [
-			{ label: 'Analytical + Low incubation', desc: 'Works through problems step by step in real time — the debugger' },
 			{ label: 'Analytical + High incubation', desc: 'Decomposes analytically, then incubates — the architect' },
-			{ label: 'Holistic + Low incubation', desc: 'Grasps the whole shape and builds immediately — the intuitive' },
+			{ label: 'Analytical + Low incubation', desc: 'Works through problems step by step in real time — the debugger' },
 			{ label: 'Holistic + High incubation', desc: 'Absorbs the whole problem and lets it cook — the marinator' },
+			{ label: 'Holistic + Low incubation', desc: 'Grasps the whole shape and builds immediately — the intuitive' },
 		],
-		informs: null,
+		informs: 'Scrum, Sprint Estimation / Story Points',
 		methodologyPhases: [],
 	},
 	{
@@ -359,7 +359,7 @@ export const COMPASSES: Compass[] = [
 			{ label: 'Low incubation + Proactive', desc: 'Plan carefully, execute at the keyboard — steady producer' },
 			{ label: 'Low incubation + Emergent', desc: 'Just build — fastest path from problem to solution' },
 		],
-		informs: null,
+		informs: 'Test-Driven Development, "Build simple, abstract later" / YAGNI, Pair Programming',
 		methodologyPhases: [],
 	},
 ];
