@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { evaluateMethod, scoreAlternative, isAlternativeRelevant } from './evaluation.js';
+import { evaluateMethod, scoreAlternative } from './evaluation.js';
 import type { Method, CompassDataMap } from '$lib/data/types.js';
 
 const emptyCompassData: CompassDataMap = {};
@@ -179,25 +179,5 @@ describe('scoreAlternative', () => {
 			data,
 		);
 		expect(score).toBe(0.5);
-	});
-});
-
-describe('isAlternativeRelevant (deprecated)', () => {
-	it('returns true when relevant is empty', () => {
-		expect(isAlternativeRelevant([], emptyCompassData)).toBe(true);
-	});
-
-	it('returns true when user matches any reference', () => {
-		const data: CompassDataMap = {
-			'design-methodology': { quadrant: 0, intensity: 1, notes: '' },
-		};
-		expect(isAlternativeRelevant(['design-methodology-0'], data)).toBe(true);
-	});
-
-	it('returns false when user matches none', () => {
-		const data: CompassDataMap = {
-			'design-methodology': { quadrant: 2, intensity: 1, notes: '' },
-		};
-		expect(isAlternativeRelevant(['design-methodology-0'], data)).toBe(false);
 	});
 });

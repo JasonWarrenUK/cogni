@@ -1,42 +1,59 @@
-# sv
+# Cogni — Developer Cognition Profile
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+A self-assessment tool that maps your cognitive style to the development methodologies you work with every day. Instead of asking "do you like TDD?" it asks *why* TDD might or might not fit — and derives that answer from your cognitive profile.
 
-## Creating a project
+## What it does
 
-If you're seeing this, you've probably already done this step. Congrats!
+You position yourself on **17 compasses** — two-axis frameworks that capture dimensions of how you think and work. Cogni then computes personalised fit scores for **10+ established development methodologies** (TDD, Scrum, Shape Up, Kanban, and more), explaining the mechanism behind each fit or friction in terms of your specific positions.
+
+The output is a complete Markdown document you can carry into a manager 1:1, a job evaluation, or a team retrospective.
+
+## The compass model
+
+Compasses are organised in three tiers:
+
+| Tier | What it captures | Informs |
+|------|-----------------|---------|
+| **1** | Process and behavioural dimensions | Directly evaluated against methodologies |
+| **2** | Cognitive modifiers | Refine and explain tier-1 positions |
+| **3** | Foundational cognitive style | Explains *why* you sit where you do on tiers 1–2 |
+
+Compasses on the same axis constrain each other — the UI crosshatches quadrants that would contradict a position you've already established elsewhere.
+
+## Running locally
 
 ```sh
-# create a new project
-npx sv create my-app
+bun install
+bun run dev
 ```
 
-To recreate this project with the same configuration:
-
-```sh
-# recreate this project
-npx sv create --template minimal --types ts --no-install .
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+Requires [Bun](https://bun.sh). Node/npm also work — use `npm install` and `npm run dev`.
 
 ## Building
 
-To create a production version of your app:
-
 ```sh
-npm run build
+bun run build
+bun run preview
 ```
 
-You can preview the production build with `npm run preview`.
+## Type-checking
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+```sh
+bun run check
+```
+
+## Tests
+
+```sh
+bun run test:unit
+```
+
+Unit tests cover the core logic modules: constraint propagation, method evaluation, profile synthesis, and import/export.
+
+## Profile persistence
+
+Profiles are stored in `localStorage` under the key `cogni-profile`. Export as JSON to back up or transfer; import to restore. The Markdown export is a portable human-readable version of the full profile.
+
+## Version
+
+v0.6 — originated by Jason Warren & Claude, February 2026.

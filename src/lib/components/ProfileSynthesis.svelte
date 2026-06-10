@@ -99,7 +99,7 @@
 	}
 
 	.insight.narrative .insight-title {
-		color: #c4b5fd;
+		color: var(--fit-meta-text);
 	}
 
 	.insight-body {

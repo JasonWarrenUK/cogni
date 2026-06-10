@@ -15,6 +15,9 @@
 	import ReferenceLibrary from '$lib/components/ReferenceLibrary.svelte';
 	import CognitiveIdentity from '$lib/components/CognitiveIdentity.svelte';
 	import TogglePanel from '$lib/components/TogglePanel.svelte';
+	import SectionNav from '$lib/components/SectionNav.svelte';
+	import Onboarding from '$lib/components/Onboarding.svelte';
+	import ProfileUses from '$lib/components/ProfileUses.svelte';
 	import { evaluateMethod } from '$lib/logic/evaluation.js';
 
 	let heroVisible = $state(false);
@@ -156,6 +159,8 @@
 	<div class="hero-scroll">Scroll to begin</div>
 </div>
 
+<SectionNav />
+
 <!-- Main content -->
 <div class="container">
 
@@ -178,8 +183,15 @@
 		</div>
 	</FadeIn>
 
+	<!-- Onboarding (collapsible) -->
+	<FadeIn>
+		<div class="onboarding-wrapper">
+			<Onboarding />
+		</div>
+	</FadeIn>
+
 	<!-- Part 1: Compasses (Tier 1 & 2) -->
-	<section class="section">
+	<section id="section-compasses" class="section">
 		<FadeIn>
 			<div class="part-label">Part 1</div>
 			<h2 class="section-title">Compasses</h2>
@@ -211,7 +223,7 @@
 	{/if}
 
 	<!-- Part 2: Methodology Relations -->
-	<section class="section section-shaded">
+	<section id="section-methodology" class="section section-shaded">
 		<FadeIn>
 			<div class="part-label">Part 2</div>
 			<h2 class="section-title">Methodology Relations</h2>
@@ -237,7 +249,7 @@
 		{/if}
 
 		{#each ESTABLISHED_METHODS as method}
-			<MethodCard {method} compassData={profile.compassData} context={profile.projectContext} />
+			<MethodCard {method} compassData={profile.compassData} context={profile.projectContext} evaluations={methodEvaluations} methodNames={methodNamesMap} />
 		{/each}
 
 		{#if anyPositioned}
@@ -256,7 +268,7 @@
 	</section>
 
 	<!-- Part 3: Cognitive Foundations (Tier 3) -->
-	<section class="section">
+	<section id="section-cognitive" class="section">
 		<FadeIn>
 			<div class="part-label">Part 3</div>
 			<h2 class="section-title">Cognitive Foundations</h2>
@@ -286,7 +298,7 @@
 	</section>
 
 	<!-- Part 4: Reference Library -->
-	<section class="section section-shaded">
+	<section id="section-reference" class="section section-shaded">
 		<FadeIn>
 			<div class="part-label">Part 4</div>
 			<h2 class="section-title">Reference Library</h2>
@@ -306,6 +318,13 @@
 			</TogglePanel>
 		</FadeIn>
 	</section>
+
+	<!-- Profile uses -->
+	{#if anyPositioned}
+		<FadeIn>
+			<ProfileUses />
+		</FadeIn>
+	{/if}
 
 	<!-- Footer -->
 	<footer>
@@ -527,6 +546,10 @@
 		line-height: 1.7;
 		margin: 0 0 40px;
 		max-width: 660px;
+	}
+
+	.onboarding-wrapper {
+		padding: 32px 0 8px;
 	}
 
 	footer {
