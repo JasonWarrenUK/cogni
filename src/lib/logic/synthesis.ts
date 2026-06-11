@@ -79,27 +79,121 @@ function detectTensions(dims: ReturnType<typeof getDimPositions>): ProfileInsigh
 	return insights;
 }
 
+interface Archetype {
+	/** Human-readable name shown in the narrative title */
+	name: string;
+	/** Authored narrative body (pre-written, not assembled). All @draft. */
+	body: string;
+	/**
+	 * Predicate over the dominants map. Must return true for the archetype to match.
+	 * Each check is: dominants[axisLabel] === direction.
+	 * An archetype matches if ALL required conditions hold.
+	 */
+	requires: Array<{ axis: string; dir: 'high' | 'low' }>;
+	/** Number of matching requires entries needed to trigger (default = all) */
+	minMatch?: number;
+}
+
 /**
- * Generates a 2-3 sentence narrative characterising the overall profile shape.
- * Reads the dominant patterns across tiers to produce a human-readable shape description.
+ * Pre-authored archetype narratives. Checked in order; first match wins.
+ * Fallback: the assembler below.
+ * All body strings are @draft — review before shipping.
  */
-function buildNarrative(
-	dims: ReturnType<typeof getDimPositions>,
-	positionedCount: number,
-	totalCount: number,
-): ProfileInsight | null {
-	if (positionedCount < 5) return null; // Not enough data for a meaningful narrative
+const ARCHETYPES: Archetype[] = [
+	{
+		name: 'The Incubating Architect',
+		requires: [
+			{ axis: 'Structuring orientation', dir: 'high' },
+			{ axis: 'Incubation reliance', dir: 'high' },
+			{ axis: 'Self-regulation', dir: 'high' },
+		],
+		body: "You think in models and you think slowly — on purpose. Before writing a line of code, you've already built the system in your head, tested edge cases, and restructured it twice. Methodologies that assume you can estimate immediately or commit to a sprint without adequate incubation time will always feel like they're asking you to work before you're ready. The best working environments for you give you the space to think, then step back and let you build.", // @draft
+	},
+	{
+		name: 'The Flow-State Shipper',
+		requires: [
+			{ axis: 'Incubation reliance', dir: 'low' },
+			{ axis: 'Structuring orientation', dir: 'low' },
+			{ axis: 'Peer collaboration', dir: 'low' },
+		],
+		body: "You get in, you build, you ship. You don't need to see the whole picture before starting — you find the picture by building it. Interruptions are your main enemy: standups, planning ceremonies, and pairing sessions all break the rhythm that lets you do your best work. Methodologies that minimise ceremony and protect flow time — Shape Up, async-first, trunk-based development — are designed for exactly the way you think.", // @draft
+	},
+	{
+		name: 'The Collaborative Structurer',
+		requires: [
+			{ axis: 'Structuring orientation', dir: 'high' },
+			{ axis: 'Peer collaboration', dir: 'high' },
+		],
+		body: "You think in systems and you do your best thinking out loud. Where solitary architects retreat into their heads, you want the whiteboard and a collaborator. Your designs emerge from conversation — the structure is rigorous, but the process that produces it is social. Pair programming, collaborative DDD modelling, and synchronous code review all suit you because they let you externalise and interrogate the model while it's still forming.", // @draft
+	},
+	{
+		name: 'The Externally-Anchored Executor',
+		requires: [
+			{ axis: 'Self-regulation', dir: 'low' },
+			{ axis: 'Incubation reliance', dir: 'low' },
+		],
+		body: "You work best when the structure is clear and the feedback is fast. Sprints, standups, and estimation rituals aren't overhead for you — they're the scaffolding that keeps you oriented and moving. Without them, you drift. Scrum, Kanban, and daily standups are methodologies built for your operating model: defined cadences, visible progress, and regular synchronisation points that let you know you're on track.", // @draft
+	},
+	{
+		name: 'The Analytical Solo Worker',
+		requires: [
+			{ axis: 'Processing mode', dir: 'high' },
+			{ axis: 'Peer collaboration', dir: 'low' },
+			{ axis: 'Self-regulation', dir: 'high' },
+		],
+		body: "You decompose problems systematically and you do it alone. You're not antisocial — you just find that other people in the problem-solving loop slow you down rather than accelerating you. Your natural workflow is: understand the problem fully, design the solution internally, implement in a long solo session, then surface for feedback via async code review. TDD, documentation-driven development, and PR-based review fit your loop; pairing and standups don't.", // @draft
+	},
+	{
+		name: 'The Holistic Risk-Averse Planner',
+		requires: [
+			{ axis: 'Processing mode', dir: 'low' },
+			{ axis: 'Structuring orientation', dir: 'high' },
+			{ axis: 'Incubation reliance', dir: 'high' },
+		],
+		body: "You need to see the whole shape before you commit to any part of it. Breaking a problem into sprint-sized pieces before you've mapped the full territory is uncomfortable — you know from experience that premature decomposition produces plans that don't survive contact with the actual system. Shape Up's appetite-setting and DDD's domain modelling appeal to you because they let you think at the system level before descending into implementation.", // @draft
+	},
+	{
+		name: 'The Pragmatic Adaptor',
+		requires: [
+			{ axis: 'Structuring orientation', dir: 'low' },
+			{ axis: 'Self-regulation', dir: 'low' },
+			{ axis: 'Peer collaboration', dir: 'high' },
+		],
+		body: "You're flexible. You pick up whatever methodology the team is running and make it work, because your instinct is to solve the social problem (how does this group ship software together?) rather than the philosophical one (what is the correct way to build software?). This is a genuine strength in teams with mixed styles, but it can mean you lack a strong prior about what 'good' looks like. Building that prior — even a rough one — will help you advocate for your team when it counts.", // @draft
+	},
+	{
+		name: 'The Emergent Experimenter',
+		requires: [
+			{ axis: 'Structuring orientation', dir: 'low' },
+			{ axis: 'Incubation reliance', dir: 'low' },
+			{ axis: 'Self-regulation', dir: 'high' },
+		],
+		body: "You learn by doing, and you don't need anyone to give you the problem. You're at your best when given a vague direction and full autonomy — you'll prototype your way to an answer that no one could have specified upfront. Methodologies that require detailed upfront planning or tight sprint commitments feel like a cage. Shape Up's 'shaped but not specified' model fits you well: appetite without prescription, autonomy without ambiguity.", // @draft
+	},
+];
 
-	// Gather dominant directions per axis
-	const dominants: Record<string, 'high' | 'low'> = {};
-	for (const [label, positions] of Object.entries(dims)) {
-		const highCount = positions.filter((p) => p.dir === 'high').length;
-		const lowCount = positions.filter((p) => p.dir === 'low').length;
-		if (highCount !== lowCount) {
-			dominants[label] = highCount > lowCount ? 'high' : 'low';
-		}
+/**
+ * Attempts to match the dominants map against the archetype table.
+ * Returns the first archetype whose conditions are satisfied, or null.
+ */
+function matchArchetype(dominants: Record<string, 'high' | 'low'>): Archetype | null {
+	for (const archetype of ARCHETYPES) {
+		const minMatch = archetype.minMatch ?? archetype.requires.length;
+		const matchCount = archetype.requires.filter(
+			(req) => dominants[req.axis] === req.dir,
+		).length;
+		if (matchCount >= minMatch) return archetype;
 	}
+	return null;
+}
 
+/**
+ * Assembles a narrative from individual axis traits (fallback when no archetype matches).
+ * Less precise than an archetype but covers edge cases.
+ */
+function assembleFallbackNarrative(
+	dominants: Record<string, 'high' | 'low'>,
+): ProfileInsight | null {
 	const traits: string[] = [];
 
 	// Structuring orientation
@@ -147,11 +241,41 @@ function buildNarrative(
 		body += ` You also appear to be a ${rest.join(' and a ')}.`;
 	}
 
-	return {
-		type: 'narrative',
-		title: 'Profile shape',
-		body,
-	};
+	return { type: 'narrative', title: 'Profile shape', body };
+}
+
+/**
+ * Generates a narrative insight: archetype-matched if possible, assembled as fallback.
+ */
+function buildNarrative(
+	dims: ReturnType<typeof getDimPositions>,
+	positionedCount: number,
+	totalCount: number,
+): ProfileInsight | null {
+	if (positionedCount < 5) return null; // Not enough data for a meaningful narrative
+
+	// Gather dominant directions per axis
+	const dominants: Record<string, 'high' | 'low'> = {};
+	for (const [label, positions] of Object.entries(dims)) {
+		const highCount = positions.filter((p) => p.dir === 'high').length;
+		const lowCount = positions.filter((p) => p.dir === 'low').length;
+		if (highCount !== lowCount) {
+			dominants[label] = highCount > lowCount ? 'high' : 'low';
+		}
+	}
+
+	// Try archetype match first
+	const archetype = matchArchetype(dominants);
+	if (archetype) {
+		return {
+			type: 'narrative',
+			title: archetype.name,
+			body: archetype.body,
+		};
+	}
+
+	// Fall back to assembled narrative
+	return assembleFallbackNarrative(dominants);
 }
 
 /**

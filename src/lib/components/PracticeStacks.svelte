@@ -30,6 +30,18 @@
 
 					<p class="stack-desc">{stack.desc}</p>
 
+					<div class="stack-score-bar" title="Weighted fit score for this stack">
+						<div class="score-track">
+							<div class="score-marker" style:left="{Math.round(((score + 1) / 2) * 100)}%"></div>
+						</div>
+						<span
+							class="stack-fit-label"
+							style:color={score >= 0.3 ? FIT_META.natural.color : score >= -0.1 ? FIT_META.adapt.color : FIT_META.friction.color}
+						>
+							{score >= 0.3 ? FIT_META.natural.label : score >= -0.1 ? FIT_META.adapt.label : FIT_META.friction.label}
+						</span>
+					</div>
+
 					<div class="stack-methods">
 						{#each stack.methods as methodId, i}
 							{@const ev = methodEvaluations[i]}
@@ -84,7 +96,7 @@
 	.stack-name {
 		font-family: var(--serif);
 		font-size: 16px;
-		color: #e0e0e0;
+		color: var(--text);
 		margin-bottom: 2px;
 	}
 
@@ -94,6 +106,49 @@
 		color: var(--text-faint);
 		text-transform: uppercase;
 		letter-spacing: 1.5px;
+	}
+
+	.stack-score-bar {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		margin: 6px 0 10px;
+	}
+
+	.score-track {
+		position: relative;
+		height: 2px;
+		width: 100%;
+		max-width: 160px;
+		background: linear-gradient(
+			to right,
+			var(--fit-friction) 0%,
+			var(--fit-friction) 20%,
+			var(--fit-adapt) 40%,
+			var(--fit-adapt) 60%,
+			var(--fit-natural) 80%,
+			var(--fit-natural) 100%
+		);
+		border-radius: 2px;
+		opacity: 0.5;
+	}
+
+	.score-marker {
+		position: absolute;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		width: 5px;
+		height: 5px;
+		background: var(--text);
+		border-radius: 50%;
+	}
+
+	.stack-fit-label {
+		font-family: var(--mono);
+		font-size: 9px;
+		text-transform: uppercase;
+		letter-spacing: 1.5px;
+		white-space: nowrap;
 	}
 
 	.stack-desc {

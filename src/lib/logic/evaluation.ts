@@ -112,11 +112,17 @@ export function evaluateMethod(
 	};
 }
 
+export interface AlternativeScore {
+	score: number;
+	matchCount: number;
+	totalRefs: number;
+}
+
 /** Scores an alternative based on how many of its relevant compass positions match the user's. */
 export function scoreAlternative(
 	relevant: string[],
 	compassData: CompassDataMap,
-): ScoredAlternative['score'] extends number ? { score: number; matchCount: number; totalRefs: number } : never {
+): AlternativeScore {
 	if (relevant.length === 0) {
 		return { score: 0.5, matchCount: 0, totalRefs: 0 };
 	}
@@ -131,19 +137,4 @@ export function scoreAlternative(
 	const score = matchCount / relevant.length;
 
 	return { score, matchCount, totalRefs: relevant.length };
-}
-
-/** @deprecated Use scoreAlternative instead. Kept for backwards compatibility. */
-export function isAlternativeRelevant(
-	relevant: string[],
-	compassData: CompassDataMap,
-): boolean {
-	if (relevant.length === 0) return true;
-
-	return relevant.some((ref) => {
-		const lastDash = ref.lastIndexOf('-');
-		const compassId = ref.substring(0, lastDash);
-		const quadrantIndex = parseInt(ref.substring(lastDash + 1), 10);
-		return compassData[compassId]?.quadrant === quadrantIndex;
-	});
 }

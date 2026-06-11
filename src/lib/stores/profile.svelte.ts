@@ -72,15 +72,19 @@ function createProfileStore() {
 		saveStatus = 'unsaved';
 		if (saveTimer) clearTimeout(saveTimer);
 		saveTimer = setTimeout(() => {
-			if (typeof localStorage !== 'undefined') {
-				localStorage.setItem(STORAGE_KEY, JSON.stringify({
-					version: VERSION,
-					compassData,
-					growth,
-					references,
-					structuredReferences,
-					projectContext,
-				}));
+			try {
+				if (typeof localStorage !== 'undefined') {
+					localStorage.setItem(STORAGE_KEY, JSON.stringify({
+						version: VERSION,
+						compassData,
+						growth,
+						references,
+						structuredReferences,
+						projectContext,
+					}));
+				}
+			} catch {
+				// localStorage may be unavailable (private browsing, storage quota exceeded)
 			}
 			saveStatus = 'saved';
 		}, 300);

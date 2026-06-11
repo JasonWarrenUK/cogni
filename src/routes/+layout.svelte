@@ -56,6 +56,11 @@
 		--accent-action: #5b8def;
 		--accent-meta: #a78bfa;
 
+		/* Fit tint colours (for backgrounds/soft highlights) */
+		--fit-natural-soft: rgba(74, 222, 128, 0.08);
+		--fit-natural-text: #d1fae5;
+		--fit-meta-text: #c4b5fd;
+
 		/* Border radii */
 		--radius-lg: 16px;
 		--radius-md: 12px;

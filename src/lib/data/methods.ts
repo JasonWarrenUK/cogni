@@ -491,6 +491,24 @@ export const ESTABLISHED_METHODS: Method[] = [
 					text: 'You work comfortably with partial, fuzzy outlines. User stories give you a rough shape and you fill in the rest intuitively.',
 				},
 			},
+			'communication-pattern': {
+				0: {
+					fit: 'adapt',
+					text: "You collaborate closely and share constantly. User stories rely on conversation to fill in what the template leaves out — which suits your style, but you may find the format itself too thin and prefer richer written specs instead.", // @draft
+				},
+				1: {
+					fit: 'adapt',
+					text: "You work closely with peers but don't instinctively broadcast. User stories assume you'll chase down the missing context through conversation — which works for peer discussions but feels awkward when the gaps need stakeholder input.", // @draft
+				},
+				2: {
+					fit: 'friction',
+					text: "You work independently and prefer written artefacts. User stories are designed to be supplemented by conversation, not documentation — their deliberate thinness runs against your async-first, written-clarity instincts.", // @draft
+				},
+				3: {
+					fit: 'adapt',
+					text: "You work heads-down and surface context on request. User stories' conversational gap-filling model requires you to initiate those conversations — which you may not do naturally. Ensure there's a pull mechanism (e.g. a pre-sprint refinement session) so the gaps get filled before you start.", // @draft
+				},
+			},
 		},
 		alternatives: [
 			{
@@ -543,6 +561,72 @@ export const ESTABLISHED_METHODS: Method[] = [
 				work: 'About Face / The Inmates Are Running the Asylum',
 				year: 1999,
 				note: 'Pioneered persona-driven design. Argued that user stories without deep user research are just developer guesses in a template.',
+			},
+		],
+		growthPaths: {
+			'comprehension-clarity': [
+				{
+					quadrant: 0,
+					bridge: 'Specification by Example',
+					rationale: "You need both depth and precision — user stories' conversational gaps are a genuine problem for you. Specification by Example bridges this: concrete examples are richer than 'as a user I want', and they're testable.", // @draft
+					steps: [
+						"For your next story, write 3 concrete examples of the desired behaviour before writing the template.", // @draft
+						"Check each example: does it resolve a gap the story template would have left open?", // @draft
+						"Share the examples with whoever wrote the story — they'll quickly confirm or correct, which is the conversation user stories assume you'd have anyway.", // @draft
+					],
+				},
+			],
+			'ambiguity-response': [
+				{
+					quadrant: 0,
+					bridge: 'RFC-driven refinement',
+					rationale: "You can't decompose what you haven't defined. Write a short RFC before estimating any story: state the inputs, the outputs, and the unknowns. This transforms a user story into something your analytical process can work with.", // @draft
+					steps: [
+						"Before accepting a story into a sprint, write a 1-page RFC: what data comes in, what goes out, what questions remain.", // @draft
+						"Use the unknowns list as your acceptance criteria checklist — every unknown must be resolved before you start.", // @draft
+						"Share the RFC with the team; it becomes the real story, and the As-a-User template becomes the one-line summary.", // @draft
+					],
+				},
+				{
+					quadrant: 2,
+					bridge: 'Event Storming lite',
+					rationale: "You need the whole picture before you can work with the parts. A rapid Event Storming session (even just 30 minutes with sticky notes) builds the domain map user stories assume you already have.", // @draft
+					steps: [
+						"Before sprint planning, run a 30-minute domain event mapping session with the product owner.", // @draft
+						"Map what happens *before* and *after* each story — the context that the As-a-User template strips out.", // @draft
+						"Use the event map as your personal reference during implementation — it supplies the holistic picture the stories don't.", // @draft
+					],
+				},
+			],
+		},
+		contextModifiers: [
+			{
+				phase: 'greenfield',
+				compassId: 'ambiguity-response',
+				quadrant: 3,
+				delta: 0.3,
+				note: 'Greenfield: user stories work well when the domain is genuinely new and the team is discovering requirements through building.', // @draft
+			},
+			{
+				phase: 'legacy',
+				compassId: 'comprehension-clarity',
+				quadrant: 0,
+				delta: -0.3,
+				note: 'Legacy: user stories on existing systems leave dangerous gaps — existing behaviour is assumed, not specified. Deep-comprehension developers need more context than the template provides.', // @draft
+			},
+			{
+				teamSize: 'solo',
+				compassId: 'communication-pattern',
+				quadrant: 2,
+				delta: -0.2,
+				note: "Solo: user stories' conversational gap-filling model has no one to converse with. Their value depends entirely on the quality of the acceptance criteria.", // @draft
+			},
+			{
+				teamSize: 'large',
+				compassId: 'ambiguity-response',
+				quadrant: 1,
+				delta: 0.2,
+				note: 'Large team: user stories become a shared vocabulary that keeps diverse contributors aligned without requiring full-spec documents.', // @draft
 			},
 		],
 	},
@@ -670,6 +754,94 @@ export const ESTABLISHED_METHODS: Method[] = [
 				work: 'Is Design Dead?',
 				year: 2004,
 				note: "Explored whether evolutionary design (XP's approach) actually works without upfront architecture. Concluded it requires design skill, not just restraint.",
+			},
+		],
+		growthPaths: {
+			'architecture-philosophy': [
+				{
+					quadrant: 0,
+					bridge: 'Hexagonal Architecture skeleton',
+					rationale: "You plan for future change from day one — YAGNI feels like leaving the scaffolding out. Try this: build the hexagonal skeleton (ports and adapters) upfront as a permanent structure, then YAGNI the implementations. You get the abstraction boundaries without over-engineering the logic.", // @draft
+					steps: [
+						"Identify the external dependencies in your next feature (database, API, UI).", // @draft
+						"Define ports (interfaces) for each — this is the one abstraction you allow yourself upfront.", // @draft
+						"Implement the simplest adapter for each port. The business logic stays YAGNI; the structure is explicit from the start.", // @draft
+					],
+				},
+			],
+			'design-methodology': [
+				{
+					quadrant: 0,
+					bridge: 'Type-Driven YAGNI',
+					rationale: "You define structure proactively — YAGNI asks you to hold back. The synthesis: invest in the type model upfront (this is your model-first instinct), but YAGNI the implementation. Rich types replace premature abstraction without abandoning upfront clarity.", // @draft
+					steps: [
+						"Design your domain types fully before writing any implementation code.", // @draft
+						"Once the types are settled, write the simplest implementation that satisfies them.", // @draft
+						"When you feel the urge to add an abstraction layer, ask: does the type model require it? If not, defer.", // @draft
+					],
+				},
+				{
+					quadrant: 1,
+					bridge: 'Domain model first, YAGNI thereafter',
+					rationale: "You invest in upfront domain modelling. Make that the one permitted upfront investment: write the domain model fully, then YAGNI everything downstream of it. The model is not premature abstraction — it's the specification that makes YAGNI safe.", // @draft
+					steps: [
+						"Write your domain model as a pure set of types and interfaces before any implementation.", // @draft
+						"Implement only what the current feature requires — no infrastructure hooks, no generalisation.", // @draft
+						"When a second feature forces a generalisation, extract it then. Your domain model will show you what to extract.", // @draft
+					],
+				},
+			],
+			'creative-workflow': [
+				{
+					quadrant: 0,
+					bridge: 'Post-incubation commit',
+					rationale: "After incubating a problem you arrive with a structural vision that YAGNI would have you ignore. Instead: write that vision down as a design note, then implement the YAGNI-minimal version. The design note is your intention record — you can build toward it later without building it now.", // @draft
+					steps: [
+						"After your incubation phase, write a 10-line design note capturing the structure you arrived at.", // @draft
+						"Implement only what the current story requires, referencing the design note as a north star.", // @draft
+						"Revisit the design note when the second or third related story arrives — that's when YAGNI allows you to build toward it.", // @draft
+					],
+				},
+				{
+					quadrant: 1,
+					bridge: 'Spike then simplify',
+					rationale: "You need incubation and prefer emergent structure — which actually aligns with YAGNI. The friction is that your incubation produces structural visions you want to act on immediately. Run a spike to externalise the vision, then implement the simplest version. The spike counts as your incubation output.", // @draft
+					steps: [
+						"Allow yourself an unconstrained spike to explore the structural space.", // @draft
+						"From the spike, identify the single simplest thing that satisfies the current requirement.", // @draft
+						"Throw away the spike. Implement the simplified version. Trust that the spike has pre-loaded the next abstraction if it's needed.", // @draft
+					],
+				},
+			],
+		},
+		contextModifiers: [
+			{
+				phase: 'greenfield',
+				compassId: 'architecture-philosophy',
+				quadrant: 3,
+				delta: 0.4,
+				note: 'Greenfield: YAGNI is strongest early — no legacy constraints mean the simplest thing genuinely is the best starting point.', // @draft
+			},
+			{
+				phase: 'legacy',
+				compassId: 'architecture-philosophy',
+				quadrant: 0,
+				delta: 0.3,
+				note: 'Legacy: even proactive architects benefit from YAGNI discipline when touching a legacy system — adding abstraction to an existing codebase requires understanding it first.', // @draft
+			},
+			{
+				phase: 'research',
+				compassId: 'design-methodology',
+				quadrant: 2,
+				delta: 0.3,
+				note: "Research: YAGNI's 'simplest thing first' is exactly right for exploratory spikes — don't build infrastructure for code you'll likely throw away.", // @draft
+			},
+			{
+				teamSize: 'large',
+				compassId: 'architecture-philosophy',
+				quadrant: 0,
+				delta: -0.3,
+				note: 'Large team: YAGNI is harder to apply across many contributors — without upfront structure, different developers build different abstractions for the same problem.', // @draft
 			},
 		],
 	},
@@ -853,6 +1025,24 @@ export const ESTABLISHED_METHODS: Method[] = [
 					text: "You grasp rough shapes from incomplete information. 'About this big' is a natural mode of thought for you — story points just formalise it.",
 				},
 			},
+			'communication-pattern': {
+				0: {
+					fit: 'adapt',
+					text: "You collaborate closely and share constantly. Estimation sessions are a natural opportunity for shared sense-making — but the point-assignment ritual may feel like it reduces a rich conversation to a number.", // @draft
+				},
+				1: {
+					fit: 'adapt',
+					text: "You collaborate with peers synchronously but don't instinctively broadcast. Estimation works for you in small groups but the formality of planning poker can feel like ceremony compared to a quick whiteboard conversation.", // @draft
+				},
+				2: {
+					fit: 'friction',
+					text: "You work independently and document proactively. Estimation sessions are synchronous ceremonies — and their output (a number) is rarely the written artefact you'd use to communicate progress. You'd rather track actual cycle time and share it in writing.", // @draft
+				},
+				3: {
+					fit: 'friction',
+					text: "You work heads-down and surface context on request. Estimation sessions require you to publicly commit to numbers in real time before you've fully understood the work — which runs against both your communication style and your processing mode.", // @draft
+				},
+			},
 		},
 		alternatives: [
 			{
@@ -900,6 +1090,72 @@ export const ESTABLISHED_METHODS: Method[] = [
 				work: 'Shape Up',
 				year: 2019,
 				note: "Replaced estimation with 'appetite' — teams don't estimate how long work takes, leadership decides how much time the work deserves.",
+			},
+		],
+		growthPaths: {
+			'time-boxing-fit': [
+				{
+					quadrant: 1,
+					bridge: 'Appetite-setting',
+					rationale: "You self-direct and don't want external time pressure — estimation is a forecasting tool for people who need to know when things will be done. Shape Up's appetite model gives you a deadline without requiring you to predict it: leadership decides how much time the work deserves; you deliver what's possible in that window.", // @draft
+					steps: [
+						"Propose replacing 'how long will this take?' with 'how much time should this get?' in your next planning session.", // @draft
+						"Set an appetite (2 days, 1 week, 3 weeks) and work to fit the most valuable scope within it.", // @draft
+						"Report progress as 'scope completed within appetite' rather than 'velocity achieved'. Same information, different frame.", // @draft
+					],
+				},
+			],
+			'ambiguity-response': [
+				{
+					quadrant: 0,
+					bridge: 'Pre-estimation RFC',
+					rationale: "You can't estimate what you haven't defined. Write a one-page RFC before each planning session: inputs, outputs, edge cases. This transforms ambiguous stories into estimable units — your analytical process needs this structure before it can size anything.", // @draft
+					steps: [
+						"The day before planning, read each candidate story and write 3-5 questions that must be answered before you can estimate it.", // @draft
+						"Share the questions with the product owner and resolve them before the planning session.", // @draft
+						"Estimate only stories that have answered your questions. For the rest, record a 'needs definition' spike instead of a point count.", // @draft
+					],
+				},
+				{
+					quadrant: 2,
+					bridge: 'Holistic pre-read',
+					rationale: "You need the whole picture before you can size the parts. Read the entire sprint candidate list 24 hours before planning and form a gestalt view of what the sprint is actually trying to accomplish. Then estimate from that whole picture rather than story by story.", // @draft
+					steps: [
+						"Get the sprint candidate list the day before planning and read it in one sitting.", // @draft
+						"Write a one-paragraph summary of what this sprint is trying to do — the underlying goal behind the stories.", // @draft
+						"Estimate relative to each other ('this is twice the size of that') rather than against an absolute scale.", // @draft
+					],
+				},
+			],
+		},
+		contextModifiers: [
+			{
+				phase: 'research',
+				compassId: 'ambiguity-response',
+				quadrant: 0,
+				delta: -0.4,
+				note: 'Research: estimating exploratory work is fundamentally dishonest — the outcome is unknown by definition. Use timeboxes (spikes) rather than point estimates.', // @draft
+			},
+			{
+				phase: 'legacy',
+				compassId: 'ambiguity-response',
+				quadrant: 0,
+				delta: -0.3,
+				note: 'Legacy: estimation is harder on legacy systems — hidden complexity and surprise dependencies routinely invalidate point estimates.', // @draft
+			},
+			{
+				teamSize: 'solo',
+				compassId: 'time-boxing-fit',
+				quadrant: 1,
+				delta: -0.4,
+				note: 'Solo: estimation is a coordination tool. Solo developers have no one to coordinate with — the process produces overhead with no benefit.', // @draft
+			},
+			{
+				teamSize: 'large',
+				compassId: 'ambiguity-response',
+				quadrant: 3,
+				delta: 0.3,
+				note: 'Large team: rough shared estimates prevent wildly different individual assumptions about scope — the conversation matters more than the number.', // @draft
 			},
 		],
 	},
@@ -985,6 +1241,72 @@ export const ESTABLISHED_METHODS: Method[] = [
 				work: 'Various talks on Agile dysfunction',
 				year: 2020,
 				note: 'Argued standups had become status reports to management disguised as team coordination. The original intent was peer-to-peer, not bottom-up.',
+			},
+		],
+		growthPaths: {
+			'management-compatibility': [
+				{
+					quadrant: 1,
+					bridge: 'Async standup format',
+					rationale: "You self-direct and surface context on request — standups force you into a broadcast mode that doesn't match how you work. The async standup (written, asynchronous, pull-based) delivers the same coordination value without the synchronous interruption.", // @draft
+					steps: [
+						"Propose replacing the daily standup with a written async update (Slack, Linear, Notion — wherever the team already gathers).", // @draft
+						"Post your update at a consistent time that fits your own schedule, not at 9:30am because a calendar event says so.", // @draft
+						"Structure it as: yesterday's output, today's intention, any blockers. Three lines. Scannable at will.", // @draft
+					],
+				},
+			],
+			'communication-pattern': [
+				{
+					quadrant: 2,
+					bridge: 'Written async standup',
+					rationale: "You work independently and proactively document — you're already producing the information standups try to surface, just not in a synchronous format. Channel that into a written daily update and the standup becomes redundant.", // @draft
+					steps: [
+						"For two weeks, post a written update at the time you'd have joined the standup.", // @draft
+						"After two weeks, propose to the team: 'I've been doing async updates — can we see if the standup is still needed?' Let the data speak.", // @draft
+						"If the team still wants a standup, use your written updates as your talking points. You're already prepared.", // @draft
+					],
+				},
+				{
+					quadrant: 3,
+					bridge: 'Exception-based reporting',
+					rationale: "You work heads-down and surface context on request. Rather than forced daily broadcasting, negotiate exception-based reporting: you communicate when something changes, blocks, or ships. Silence is the update when you're on track.", // @draft
+					steps: [
+						"Define with your team what 'exception' means: blockers, delays, scope changes, completed work.", // @draft
+						"Post when one of those things happens. Miss the standup when nothing has.", // @draft
+						"After a sprint, show the team your exception log — it'll contain everything the standup would have surfaced, just without the ceremony.", // @draft
+					],
+				},
+			],
+		},
+		contextModifiers: [
+			{
+				teamSize: 'solo',
+				compassId: 'management-compatibility',
+				quadrant: 1,
+				delta: -0.5,
+				note: 'Solo: standups are a team coordination tool with zero solo value. Drop them entirely.', // @draft
+			},
+			{
+				teamSize: 'large',
+				compassId: 'management-compatibility',
+				quadrant: 3,
+				delta: 0.3,
+				note: 'Large team: standups become genuinely useful at scale as a collision-detection mechanism — preventing duplicated work across many contributors.', // @draft
+			},
+			{
+				phase: 'research',
+				compassId: 'communication-pattern',
+				quadrant: 2,
+				delta: -0.3,
+				note: "Research: standups are poorly suited to exploration phases — 'what did you do yesterday?' is a reasonable question for delivery work, not for thinking.", // @draft
+			},
+			{
+				phase: 'legacy',
+				compassId: 'management-compatibility',
+				quadrant: 2,
+				delta: 0.2,
+				note: 'Legacy: standups help coordinate surprise complexity on legacy systems — blockers surface daily rather than silently derailing the sprint.', // @draft
 			},
 		],
 	},
@@ -1121,6 +1443,62 @@ export const ESTABLISHED_METHODS: Method[] = [
 				note: "Kanban's intellectual ancestor. Pull systems in manufacturing: produce what's needed when it's needed, not to a forecast. Software Kanban is a direct translation of this logic.",
 			},
 		],
+		growthPaths: {
+			'time-boxing-fit': [
+				{
+					quadrant: 2,
+					bridge: 'WIP limits as deadline pressure',
+					rationale: "You need external structure and time pressure — Kanban removes both. The substitute is a strict WIP limit of 1: you're not allowed to pull a new card until the current one is done. This creates the same urgency as a sprint deadline, just at the task level instead of the week level.", // @draft
+					steps: [
+						"Set your personal WIP limit to 1. No in-progress items alongside blocked items — blocked means blocked.", // @draft
+						"When you feel the urge to start something new while something is blocked, write a blocker note instead and actually resolve it.", // @draft
+						"Track your cycle time per card for two weeks. The data will show you whether the WIP limit is creating the throughput pressure you need.", // @draft
+					],
+				},
+			],
+			'management-compatibility': [
+				{
+					quadrant: 3,
+					bridge: 'Throughput-based visibility',
+					rationale: "You benefit from structured check-ins — Kanban's pull model can feel invisible without ceremonies. Replace the standup with a weekly throughput review: count cards completed, cycle time trends, and upcoming work. This gives you the structured accountability of a check-in without the sprint ceremony.", // @draft
+					steps: [
+						"Every Friday, count cards completed this week and their average cycle time.", // @draft
+						"Post the numbers to your team channel with a two-sentence summary of what you worked on.", // @draft
+						"Over 4 weeks, the data will reveal your natural throughput — which becomes your 'capacity' for planning conversations.", // @draft
+					],
+				},
+			],
+		},
+		contextModifiers: [
+			{
+				phase: 'greenfield',
+				compassId: 'time-boxing-fit',
+				quadrant: 1,
+				delta: 0.3,
+				note: 'Greenfield: Kanban is well-suited to greenfield work where scope is undefined and pull-based discovery is more honest than sprint commitments.', // @draft
+			},
+			{
+				phase: 'maintenance',
+				compassId: 'time-boxing-fit',
+				quadrant: 0,
+				delta: 0.2,
+				note: 'Maintenance: Kanban fits maintenance work well — interrupt-driven, variable scope, no predictable sprint shape.', // @draft
+			},
+			{
+				teamSize: 'solo',
+				compassId: 'time-boxing-fit',
+				quadrant: 1,
+				delta: 0.3,
+				note: 'Solo: Kanban is the ideal solo workflow — personal WIP limits, self-directed pull, no coordination overhead.', // @draft
+			},
+			{
+				teamSize: 'large',
+				compassId: 'time-boxing-fit',
+				quadrant: 2,
+				delta: -0.2,
+				note: 'Large team: Kanban at scale requires mature tooling and discipline — without sprint ceremonies, shared visibility depends on everyone maintaining their board honestly.', // @draft
+			},
+		],
 	},
 	{
 		id: 'trunk-based-development',
@@ -1235,6 +1613,74 @@ export const ESTABLISHED_METHODS: Method[] = [
 				work: 'trunkbaseddevelopment.com',
 				year: 2017,
 				note: 'Documented TBD practices comprehensively, including the scaling patterns (branch by abstraction, feature flags) that make it viable for large teams.',
+			},
+		],
+		growthPaths: {
+			'team-formation': [
+				{
+					quadrant: 1,
+					bridge: 'Ship / Show / Ask',
+					rationale: "You need solo runway before syncing. TBD's continuous integration expectation removes that runway. The Ship/Show/Ask pattern is the pragmatic middle ground: commit direct when trivial, open an instant-merge PR when you want visibility, ask for review when you need input. You keep the branch discipline without losing solo depth.", // @draft
+					steps: [
+						"Classify your next 10 commits as Ship (trivial), Show (FYI), or Ask (review needed).", // @draft
+						"For Ship and Show commits, integrate within the hour — don't let branches accumulate overnight.", // @draft
+						"Notice which commits you instinctively want to protect with a long-lived branch — those are the ones to address with feature flags instead.", // @draft
+					],
+				},
+			],
+			'architecture-philosophy': [
+				{
+					quadrant: 0,
+					bridge: 'Branch by abstraction',
+					rationale: "You want to see the whole design before committing any of it. TBD's answer is branch by abstraction: create the abstraction layer in one commit, then migrate behind it incrementally. You get the upfront architectural skeleton without a long-lived branch.", // @draft
+					steps: [
+						"Identify the next large architectural change you're planning — the one you'd normally put on a feature branch.", // @draft
+						"Create the abstraction layer (interface, adapter, seam) in a single trunk commit with both old and new code behind it.", // @draft
+						"Migrate call sites behind the abstraction incrementally. Delete the old path when all sites are migrated. The architecture landed upfront; the migration was incremental.", // @draft
+					],
+				},
+			],
+			'delivery-philosophy': [
+				{
+					quadrant: 0,
+					bridge: 'Feature flags as completeness gates',
+					rationale: "You want every piece complete before it ships — TBD's partial-work-in-trunk model is the opposite. Feature flags resolve this: you can merge complete, well-tested code to trunk while keeping it invisible to users. The flag is your completeness gate; trunk just carries the work.", // @draft
+					steps: [
+						"Add a simple feature flag system (env var, config key, or a flag service).", // @draft
+						"Any incomplete feature goes behind a flag — code lands in trunk, flag stays off.", // @draft
+						"The feature ships when *you* decide it's complete and flip the flag. Trunk gets the continuous integration discipline; you keep your completeness standard.", // @draft
+					],
+				},
+			],
+		},
+		contextModifiers: [
+			{
+				teamSize: 'solo',
+				compassId: 'team-formation',
+				quadrant: 1,
+				delta: 0.3,
+				note: 'Solo: TBD is well-suited to solo work — no merge conflicts, no coordination overhead, just a single always-current branch.', // @draft
+			},
+			{
+				teamSize: 'large',
+				compassId: 'communication-pattern',
+				quadrant: 0,
+				delta: 0.3,
+				note: 'Large team: TBD scales well for teams with strong testing culture and pairing — continuous integration prevents the merge hell that long-lived branches produce at scale.', // @draft
+			},
+			{
+				phase: 'research',
+				compassId: 'delivery-philosophy',
+				quadrant: 0,
+				delta: -0.3,
+				note: 'Research: TBD is awkward for exploratory work where the outcome is uncertain — you may need to throw away a trunk commit, which is disruptive. Use short-lived spike branches instead.', // @draft
+			},
+			{
+				phase: 'legacy',
+				compassId: 'architecture-philosophy',
+				quadrant: 0,
+				delta: -0.3,
+				note: 'Legacy: TBD on legacy code without testable seams is high-risk — frequent trunk commits with no test coverage means breakage lands in main immediately.', // @draft
 			},
 		],
 	},
@@ -1401,6 +1847,72 @@ export const ESTABLISHED_METHODS: Method[] = [
 				note: "The cultural context behind Shape Up. Basecamp's argument that calm, async, autonomous work produces better outcomes than Agile's velocity-obsessed culture.",
 			},
 		],
+		growthPaths: {
+			'ambiguity-response': [
+				{
+					quadrant: 0,
+					bridge: 'RFC before the cycle',
+					rationale: "Shape Up pitches are deliberately rough — they provide direction, not specification. That ambiguity blocks your analytical process. Write a short RFC at the start of each cycle to resolve the structural gaps the pitch left open. This is your shaping-for-yourself step, not a process violation.", // @draft
+					steps: [
+						"When a cycle starts, spend the first half-day writing a one-page RFC: what exactly will be built, what's out of scope, what decisions were made.", // @draft
+						"Share the RFC with whoever shaped the pitch — this conversation often surfaces important constraints the pitch assumed but didn't state.", // @draft
+						"Use the RFC as your implementation guide for the cycle. Update it when decisions change.", // @draft
+					],
+				},
+				{
+					quadrant: 2,
+					bridge: 'Pre-cycle domain mapping',
+					rationale: "You need the whole picture before you can start. A Shape Up pitch describes a problem and a rough approach — not the complete territory. Spend the first day of a cycle mapping the domain: what touches what, what already exists, what's genuinely new.", // @draft
+					steps: [
+						"On day 1 of the cycle, draw the system map: existing code, new code, and the seams between them.", // @draft
+						"Identify the holistic picture the pitch assumed — the background context that shapes what 'done' means.", // @draft
+						"Only start building once the full picture has formed. This is not procrastination; it's the prerequisite for your best work.", // @draft
+					],
+				},
+			],
+			'architecture-philosophy': [
+				{
+					quadrant: 0,
+					bridge: 'Architectural pre-commitment',
+					rationale: "You plan for future change from day one — Shape Up's fixed-time model means architectural decisions get made under deadline pressure. Front-load the architectural thinking: on day 1, write your architectural decisions as ADRs and get alignment. Spend the rest of the cycle executing a plan you're confident in.", // @draft
+					steps: [
+						"Write 2-3 Architecture Decision Records at the start of the cycle for the decisions that will be hardest to change later.", // @draft
+						"Share them with your team and get explicit agreement. This replaces the implicit architectural assumptions that usually live only in your head.", // @draft
+						"Implement the cycle within the architectural frame you've established. Scope down if necessary — the architecture is the non-negotiable part.", // @draft
+					],
+				},
+			],
+		},
+		contextModifiers: [
+			{
+				phase: 'greenfield',
+				compassId: 'process-fit-temporal',
+				quadrant: 0,
+				delta: 0.3,
+				note: 'Greenfield: Shape Up is strongest on greenfield work where the team has genuine autonomy and no legacy constraints to navigate.', // @draft
+			},
+			{
+				phase: 'legacy',
+				compassId: 'ambiguity-response',
+				quadrant: 0,
+				delta: -0.3,
+				note: 'Legacy: Shape Up pitches assume the team can execute autonomously; on legacy code, hidden complexity often invalidates the pitch\'s scope assumptions mid-cycle.', // @draft
+			},
+			{
+				teamSize: 'solo',
+				compassId: 'management-compatibility',
+				quadrant: 0,
+				delta: 0.3,
+				note: 'Solo: Shape Up\'s autonomous cycle model is excellent for solo developers — you set your own appetite, shape your own pitches, and report on completion rather than velocity.', // @draft
+			},
+			{
+				teamSize: 'small',
+				compassId: 'team-formation',
+				quadrant: 1,
+				delta: 0.3,
+				note: 'Small team (2-5): Shape Up\'s cycle model was designed for this team size — small enough to share context informally, large enough to divide the cycle\'s work.', // @draft
+			},
+		],
 	},
 	{
 		id: 'documentation-driven-development',
@@ -1558,6 +2070,84 @@ export const ESTABLISHED_METHODS: Method[] = [
 				note: "The ubiquitous language concept is DDD's implicit documentation model — the code, the docs, and the conversations should all use the same terms. Writing documentation first forces the ubiquitous language to exist before the code.",
 			},
 		],
+		growthPaths: {
+			'comprehension-clarity': [
+				{
+					quadrant: 3,
+					bridge: 'README after first prototype',
+					rationale: "You discover through building — writing documentation before you've built anything feels like speculation. Use a two-phase DDD: build a throwaway prototype first (your discovery mode), then write the documentation, then rebuild properly. The doc describes what you've learned, not what you're guessing.", // @draft
+					steps: [
+						"Build an unconstrained prototype to understand the problem space. Give yourself a fixed timebox (2-4 hours).", // @draft
+						"Throw away the prototype code. Write the README/docs that describe what you *would* build now that you understand the domain.", // @draft
+						"Build the real thing against the documentation you just wrote. You've done DDD; you just did it in the right order for your style.", // @draft
+					],
+				},
+			],
+			'design-methodology': [
+				{
+					quadrant: 2,
+					bridge: 'Test-as-documentation',
+					rationale: "You let design emerge through tests — DDD asks you to write prose documentation first, which inverts your natural flow. The synthesis: treat your test suite as your documentation. Write failing tests that describe the intended interface before implementing. Tests are executable documentation; this is DDD in a language you already speak.", // @draft
+					steps: [
+						"Before writing any implementation, write test cases that describe the API from the consumer's perspective.", // @draft
+						"Run the tests (they'll fail). The failing test output IS your living documentation.", // @draft
+						"Implement against the tests. When they pass, the documentation is verified.", // @draft
+					],
+				},
+				{
+					quadrant: 3,
+					bridge: 'README-after-spike',
+					rationale: "You build first and extract patterns after — documentation before implementation is the wrong order for you. Write the README immediately after a working prototype, before you refactor. This locks in what you've learned before refactoring obscures it.", // @draft
+					steps: [
+						"After your prototype works, stop coding and write the README first.", // @draft
+						"The README describes: what it does, how to use it, why the key decisions were made.", // @draft
+						"Use the README to guide refactoring — if the code doesn't match what the README says, fix the code.", // @draft
+					],
+				},
+			],
+			'creative-workflow': [
+				{
+					quadrant: 3,
+					bridge: 'Post-incubation doc',
+					rationale: "You act immediately and structure emerges through the work — DDD's pre-implementation document is premature. Instead, write the doc during your incubation phase as a way to externalise what's forming. The doc is your thinking tool, not your specification.", // @draft
+					steps: [
+						"When a problem is queued in your head, open a blank document and write what you know so far: the shape of the problem, the rough approach.", // @draft
+						"Don't treat it as a specification — treat it as a thinking dump. Incomplete sentences are fine.", // @draft
+						"When you start building, the doc evolves into a real specification. By the time you're halfway through, it's accurate. Publish it then.", // @draft
+					],
+				},
+			],
+		},
+		contextModifiers: [
+			{
+				phase: 'greenfield',
+				compassId: 'design-methodology',
+				quadrant: 0,
+				delta: 0.3,
+				note: 'Greenfield: DDD is strongest when starting fresh — writing the README first shapes a new API before implementation choices constrain it.', // @draft
+			},
+			{
+				phase: 'legacy',
+				compassId: 'comprehension-clarity',
+				quadrant: 3,
+				delta: -0.3,
+				note: 'Legacy: writing documentation before understanding a legacy system produces fiction. Read the code first; document what you found; then document what you intend to build.', // @draft
+			},
+			{
+				teamSize: 'solo',
+				compassId: 'communication-pattern',
+				quadrant: 2,
+				delta: 0.3,
+				note: 'Solo: DDD is excellent for solo async workers — the documentation serves as both a thinking tool and a communication artefact that can be reviewed asynchronously.', // @draft
+			},
+			{
+				phase: 'research',
+				compassId: 'design-methodology',
+				quadrant: 3,
+				delta: 0.2,
+				note: 'Research: in exploratory phases, writing a document before you start is actually useful — it forces you to articulate what you\'re trying to discover before you start discovering it.', // @draft
+			},
+		],
 	},
 	{
 		id: 'pr-code-review',
@@ -1659,6 +2249,620 @@ export const ESTABLISHED_METHODS: Method[] = [
 				work: 'Continuous Delivery',
 				year: 2010,
 				note: 'Advocated trunk-based development where code is integrated continuously, reducing the need for branch-based review.',
+			},
+		],
+		contextModifiers: [
+			{
+				phase: 'greenfield',
+				compassId: 'team-formation',
+				quadrant: 0,
+				delta: 0.2,
+				note: 'Greenfield: even strong collaborators benefit from early async PRs on a new codebase — the written record becomes architectural documentation that survives the project.', // @draft
+			},
+			{
+				phase: 'legacy',
+				compassId: 'code-quality',
+				quadrant: 2,
+				delta: -0.2,
+				note: 'Legacy: in a legacy codebase, fast-shipping pragmatists find PR review especially frustrating — every change touches fragile code that requires defensive explanation. Consider smaller PRs with explicit "this is a safe refactor" labels.', // @draft
+			},
+			{
+				teamSize: 'solo',
+				compassId: 'communication-pattern',
+				quadrant: 0,
+				delta: 0.3,
+				note: 'Solo: without team members, PR review has no audience. This context modifier reduces the fit signal for real-time communicators working alone — Ship/Show/Ask collapses to just "ship".', // @draft
+			},
+			{
+				teamSize: 'large',
+				compassId: 'team-formation',
+				quadrant: 2,
+				delta: 0.2,
+				note: 'Large team: even developers who prefer pairing find async PR review more practical at scale — you cannot pair with everyone. PRs provide the scaling mechanism that direct collaboration cannot.', // @draft
+			},
+		],
+	},
+	{
+		id: 'domain-driven-design',
+		name: 'Domain-Driven Design',
+		brief: 'Structure code around business domains. Shared language between devs and stakeholders. Model complexity explicitly.',
+		evaluators: {
+			'design-methodology': {
+				// @draft evaluator text below
+				0: {
+					fit: 'friction',
+					text: "You design from first principles, deriving structure as you go. DDD's insistence on upfront domain modelling can feel like premature abstraction — you'd rather let the structure emerge from working code. Start with Event Storming as a discovery tool, not a specification step.", // @draft
+				},
+				1: {
+					fit: 'natural',
+					text: "You start with contracts and interfaces, then implement. DDD is a direct fit — its bounded contexts and aggregate roots are exactly the kind of explicit structure you're drawn to. The shared language between your code and the domain model reduces translation overhead.", // @draft
+				},
+				2: {
+					fit: 'friction',
+					text: "You prototype your way to understanding, then restructure. DDD's modelling-first approach conflicts with your exploratory style — the domain model you'd build before implementation will differ substantially from the one you'd build after. Use DDD vocabulary after the fact, as a lens for refactoring.", // @draft
+				},
+				3: {
+					fit: 'adapt',
+					text: "You layer structure over working code incrementally. DDD can work with your style if you treat it as ongoing refactoring toward the ubiquitous language, rather than as an upfront design exercise. Each sprint, introduce one bounded context boundary more explicitly.", // @draft
+				},
+			},
+			'architecture-philosophy': {
+				0: {
+					fit: 'friction',
+					text: "You build for the specific problem at hand, resisting generic abstractions. DDD encourages defining domains, contexts, and aggregates that may feel over-engineered for a focused problem scope. Useful if the business domain is genuinely complex; overkill if the domain is thin.", // @draft
+				},
+				1: {
+					fit: 'natural',
+					text: "You build systems designed to evolve. DDD's bounded contexts give you explicit seams for future extraction or replacement — you're building the architecture, not just the feature. The anti-corruption layer pattern fits your instinct to protect your core model from external concerns.", // @draft
+				},
+				2: {
+					fit: 'natural',
+					text: "You decompose into pluggable components. DDD's hexagonal architecture alignment (ports and adapters) lets you keep the domain model pure while swapping infrastructure — database, API, UI — around it. This matches your component-first thinking.", // @draft
+				},
+				3: {
+					fit: 'adapt',
+					text: "You iterate architecture alongside the system. DDD's domain model can coexist with this style if you adopt bounded contexts as the evolution unit — each context is complete and coherent, and you split or refine as the domain understanding improves.", // @draft
+				},
+			},
+			'comprehension-clarity': {
+				0: {
+					fit: 'friction',
+					text: "You read code holistically and intuit the system shape. DDD's explicit domain vocabulary adds a translation layer between code and business intent that can feel heavy — your mental model is spatial, not linguistic. The benefit comes in team settings where others need the shared language.", // @draft
+				},
+				1: {
+					fit: 'natural',
+					text: "You trace execution paths and map data flow explicitly. DDD's ubiquitous language means the code names directly reflect what the business calls things — no mental translation between 'user' and 'account holder' or 'order' and 'purchase'. Your analytical reading style benefits from this directness.", // @draft
+				},
+				2: {
+					fit: 'adapt',
+					text: "You read widely before reading deeply. DDD's bounded contexts are actually well-suited to your scanning style — each context is a coherent unit you can read and understand before diving into another. The domain vocabulary helps you orient quickly.", // @draft
+				},
+				3: {
+					fit: 'adapt',
+					text: "You work by pattern recognition across the codebase. DDD's consistent structural patterns (aggregates, repositories, domain events) give you familiar shapes to recognise across contexts — once you've learned the pattern once, you read all contexts the same way.", // @draft
+				},
+			},
+			'ambiguity-response': {
+				0: {
+					fit: 'friction',
+					text: "You impose structure to tame ambiguity immediately. DDD is a powerful ambiguity-resolution tool, but it requires collaborative modelling with domain experts — if you're modelling alone in ambiguous space, you risk building the wrong domain model confidently. Pair Event Storming with actual stakeholder input.", // @draft
+				},
+				1: {
+					fit: 'natural',
+					text: "You gather information before committing to a structure. DDD's modelling process is exactly this — Event Storming, domain interviews, and iterative refinement before implementation. The structured discovery approach matches your information-first instinct.", // @draft
+				},
+				2: {
+					fit: 'friction',
+					text: "You prototype to explore ambiguity. DDD is philosophically opposed to this — it defers implementation until the domain model is understood. Consider using throwaway prototypes as a discovery tool, then doing a full DDD modelling pass before the real implementation.", // @draft
+				},
+				3: {
+					fit: 'adapt',
+					text: "You stay flexible and respond to emerging clarity. DDD's iterative model refinement suits this — the domain model is expected to change as understanding deepens. Treat early domain models as hypotheses, not specifications.", // @draft
+				},
+			},
+		},
+		alternatives: [
+			{
+				name: 'Event Storming',
+				desc: 'Collaborative workshop technique for discovering domain events, bounded contexts, and aggregates before writing code.',
+				relevant: ['ambiguity-response-1', 'design-methodology-1'],
+			},
+			{
+				name: 'Hexagonal Architecture (Ports and Adapters)',
+				desc: 'Keep the domain model pure; infrastructure (DB, API, UI) plugs in via ports. DDD complement that works without the full modelling overhead.',
+				relevant: ['architecture-philosophy-2', 'design-methodology-1'],
+			},
+			{
+				name: 'Clean Architecture',
+				desc: "Robert Martin's concentric-ring model: domain entities at centre, use cases, interface adapters, frameworks at the edges. Similar goals to DDD without the domain-language emphasis.",
+				relevant: ['architecture-philosophy-1', 'architecture-philosophy-2'],
+			},
+			{
+				name: 'Strategic DDD only',
+				desc: 'Use only the strategic patterns (bounded contexts, context maps, ubiquitous language) without the tactical patterns (aggregates, repositories, value objects). Lower overhead.',
+				relevant: ['design-methodology-3', 'architecture-philosophy-3'],
+			},
+		],
+		sources: [
+			{
+				author: 'Eric Evans',
+				work: 'Domain-Driven Design: Tackling Complexity in the Heart of Software',
+				year: 2003,
+				note: 'The foundational text. Introduced bounded contexts, aggregates, repositories, domain events, and the ubiquitous language. Dense but definitive.',
+			},
+			{
+				author: 'Vaughn Vernon',
+				work: 'Implementing Domain-Driven Design',
+				year: 2013,
+				note: 'Practical complement to Evans — shows how to actually implement DDD patterns in modern languages. More accessible.',
+			},
+			{
+				author: 'Alberto Brandolini',
+				work: 'Introducing Event Storming',
+				year: 2017,
+				note: 'Defined the Event Storming workshop format as a DDD discovery technique. Changed how teams approach domain modelling collaboratively.',
+			},
+		],
+		growthPaths: {
+			'design-methodology': [
+				{
+					quadrant: 0,
+					bridge: 'Event Storming as exploration, not specification', // @draft
+					rationale: "Your emergent design style generates working code before you understand the domain fully. Use Event Storming as a post-prototype reflection tool: once you have a prototype, run a solo Event Storm to name what you've built in domain terms. This converts your exploratory artefact into a shared vocabulary without forcing upfront modelling.", // @draft
+					steps: [
+						"Build a prototype until you understand the core interactions — this is your usual process.", // @draft
+						"Stop. Open a whiteboard and write down every 'thing that happened' in past-tense orange sticky notes (domain events): OrderPlaced, PaymentFailed, InvoiceGenerated.", // @draft
+						"Group events into bounded contexts — clusters of events that belong together. These become your module boundaries.", // @draft
+						"Name the concepts. The names you choose now become the names in your code: replace generic terms ('data', 'record', 'item') with domain terms.", // @draft
+					],
+				},
+				{
+					quadrant: 2,
+					bridge: 'Retrospective DDD', // @draft
+					rationale: "You prototype to learn. DDD's modelling-first approach conflicts with your exploratory workflow, but the vocabulary is still valuable after the fact. Treat DDD as a refactoring lens: once your prototype reaches a stable shape, use bounded context mapping to name what emerged and clean up the seams.", // @draft
+					steps: [
+						"After your prototype stabilises, draw a rough context map: which parts of the system are self-contained? What do they expose to each other?", // @draft
+						"Name each context with a noun that a business stakeholder would recognise.", // @draft
+						"Refactor module boundaries to match the context map — move code until the structure matches the names.", // @draft
+					],
+				},
+			],
+			'architecture-philosophy': [
+				{
+					quadrant: 0,
+					bridge: 'Strategic patterns only', // @draft
+					rationale: "You build for the specific problem and resist generic abstractions. Full DDD is over-engineered for most of your use cases, but the strategic patterns (bounded contexts, ubiquitous language) cost almost nothing and pay off significantly in team communication. Adopt the vocabulary without the structural overhead.", // @draft
+					steps: [
+						"For your next project, spend 30 minutes naming the bounded contexts before writing any code. Draw a rough diagram.", // @draft
+						"Use the domain vocabulary in all identifiers — resist the urge to use generic names like 'service', 'manager', 'handler'.", // @draft
+						"Don't implement the tactical patterns (aggregates, repositories, domain events) unless complexity genuinely demands it.", // @draft
+					],
+				},
+			],
+			'ambiguity-response': [
+				{
+					quadrant: 0,
+					bridge: 'Collaborative domain modelling', // @draft
+					rationale: "You impose structure immediately when facing ambiguity — which means you risk building the wrong model confidently. DDD's discovery process requires involving domain experts before modelling, not after. The Event Storming workshop format is designed specifically for this: it forces you to listen before structuring.", // @draft
+					steps: [
+						"Before your next design session, schedule an Event Storming session with a stakeholder or user — even 45 minutes.", // @draft
+						"Your role in the session is to facilitate, not to design. Write down what they say; resist the urge to suggest structure.", // @draft
+						"After the session, build the model from what emerged — not from what you'd have designed alone.", // @draft
+					],
+				},
+				{
+					quadrant: 2,
+					bridge: 'Throwaway prototype → domain model', // @draft
+					rationale: "Your prototyping instinct is compatible with DDD if you treat prototypes as domain discovery tools, not the real implementation. The friction comes when you ship the prototype rather than rebuilding from the domain model it revealed.", // @draft
+					steps: [
+						"Prototype as usual — explicitly mark the codebase as throwaway (a README comment, a branch name like 'spike/').", // @draft
+						"After the prototype demonstrates the core interaction, extract: what domain events occurred? What aggregates changed state? What invariants did you discover?", // @draft
+						"Start the real implementation from the domain model, not from the prototype's code. The prototype's job is done.", // @draft
+					],
+				},
+			],
+		},
+		contextModifiers: [
+			{
+				phase: 'greenfield',
+				compassId: 'design-methodology',
+				quadrant: 1,
+				delta: 0.3,
+				note: 'Greenfield: DDD delivers most value at the start of a project when domain boundaries are still fluid — modelling now prevents expensive restructuring later.', // @draft
+			},
+			{
+				phase: 'legacy',
+				compassId: 'architecture-philosophy',
+				quadrant: 0,
+				delta: -0.3,
+				note: 'Legacy: applying DDD to existing systems requires fitting a new model over existing code, often without the ability to rename or restructure freely. The strategic patterns still help; the tactical patterns are hard to retrofit.', // @draft
+			},
+			{
+				phase: 'research',
+				compassId: 'ambiguity-response',
+				quadrant: 1,
+				delta: 0.2,
+				note: 'Research: in exploratory phases, the DDD discovery process (Event Storming, domain interviews) is well-matched — you are intentionally learning the domain before building.', // @draft
+			},
+			{
+				teamSize: 'large',
+				compassId: 'comprehension-clarity',
+				quadrant: 0,
+				delta: 0.3,
+				note: 'Large team: DDD\'s ubiquitous language pays off most with larger teams — the shared vocabulary reduces cross-team miscommunication that scales badly with headcount.', // @draft
+			},
+		],
+	},
+	{
+		id: 'async-first-work',
+		name: 'Async-First Work',
+		brief: 'Default to written communication. Avoid synchronous interruptions. Protect deep-work time. Decisions recorded in writing.',
+		evaluators: {
+			'communication-pattern': {
+				// @draft evaluator text below
+				0: {
+					fit: 'friction',
+					text: "You share work in progress and think out loud with others. Async-first work requires a fundamental shift: your natural real-time collaboration must become deliberate written communication, with an explicit choice to make it async. The cognitive overhead of structuring thoughts for async consumption is real — start with a team agreement on when sync is still acceptable.", // @draft
+				},
+				1: {
+					fit: 'adapt',
+					text: "You collaborate synchronously with peers but don't broadcast widely. Async-first asks you to extend that selectivity — fewer real-time interactions, more documented decisions. The transition is manageable: replace informal syncs with brief written updates that serve the same function.", // @draft
+				},
+				2: {
+					fit: 'natural',
+					text: "You work heads-down and share written artefacts proactively. Async-first is your native operating mode — you already create the documentation and decision records that async teams run on. Optimise for discoverability: ensure your written outputs are findable, not just thorough.", // @draft
+				},
+				3: {
+					fit: 'natural',
+					text: "You work independently and respond when asked. Async-first formalises what you already do naturally. The discipline is: make your availability legible — if you're unreachable for hours, a status update prevents teammates from being blocked waiting for you.", // @draft
+				},
+			},
+			'management-compatibility': {
+				0: {
+					fit: 'friction',
+					text: "You thrive with structure, regular check-ins, and external accountability. Async-first removes the synchronous touchpoints that anchor your progress tracking. If your manager or team uses async defaults, negotiate explicit async rituals: a written EOD update, a weekly status note, a shared task board that communicates progress without requiring a meeting.", // @draft
+				},
+				1: {
+					fit: 'adapt',
+					text: "You value some structure but can self-direct within a sprint cadence. Async-first works with your style if the sprint structure (planning, retrospective) stays synchronous — treat those as the necessary sync boundaries and go async for everything in between.", // @draft
+				},
+				2: {
+					fit: 'natural',
+					text: "You self-direct and prefer minimal oversight. Async-first is a natural fit — you already manage your own work without requiring synchronous coordination. The practice formalises the autonomy you prefer.", // @draft
+				},
+				3: {
+					fit: 'natural',
+					text: "You set your own direction and work at your own pace. Async-first supports your autonomy completely. The main discipline is communicating your direction clearly enough that others don't block on you — a weekly written update is usually sufficient.", // @draft
+				},
+			},
+			'process-fit-attentional': {
+				0: {
+					fit: 'natural',
+					text: "You work in sustained, uninterrupted blocks. Async-first is designed for you — it systematically removes the interruptions (pings, standups, ad-hoc syncs) that break your flow state. The trade-off is slower feedback loops: optimise by batching your async responses into scheduled windows.", // @draft
+				},
+				1: {
+					fit: 'natural',
+					text: "You focus intensely and need clear start/end signals. Async-first preserves your focused work sessions by making interruptions opt-in. Schedule your async-response windows (e.g., 9–9:30am, 3–3:30pm) so your focused blocks are structurally protected.", // @draft
+				},
+				2: {
+					fit: 'friction',
+					text: "You work best with external rhythm and regular re-engagement. Async-first removes the external structure that helps you sustain momentum — standups, check-ins, and real-time collaboration provide the rhythm you need. If async is required, create synthetic structure: a personal standup written to a document, scheduled 90-minute focus blocks, explicit task transitions.", // @draft
+				},
+				3: {
+					fit: 'adapt',
+					text: "You work in bursts with natural context switches. Async-first is compatible with your style, but the benefit is reduced — you're already comfortable with interruptions, so the productivity gain from eliminating them is smaller. The value is in the written communication trail, not in protecting focus time.", // @draft
+				},
+			},
+			'team-formation': {
+				0: {
+					fit: 'friction',
+					text: "You thrive in highly collaborative environments with constant team contact. Async-first can feel isolating — the team is always there but never present. If async is required, create deliberate connection points: a team-wide async social channel, regular optional video coffee, explicit norms for when sync is always allowed.", // @draft
+				},
+				1: {
+					fit: 'adapt',
+					text: "You prefer deep collaboration but can sustain solo work for stretches. Async-first works if you protect a few sync touchpoints: a weekly team call, a shared decision log that surfaces discussions you'd otherwise have ad hoc. Treat async as your default, sync as your exception.", // @draft
+				},
+				2: {
+					fit: 'adapt',
+					text: "You collaborate in real time when needed and work solo when possible. Async-first formalises the solo portions of your workflow. The main adjustment is moving your 'quick Slack call to unblock' to a written question with async answer — which sometimes works fine and occasionally costs a half-day of waiting.", // @draft
+				},
+				3: {
+					fit: 'natural',
+					text: "You work independently and connect only when necessary. Async-first is the operational model you already prefer. The formal practice of async-first gives you the team agreement you need to justify not attending every meeting — the norm makes your working style legitimate, not just tolerated.", // @draft
+				},
+			},
+		},
+		alternatives: [
+			{
+				name: 'Hybrid async (core hours)',
+				desc: 'Designate 2–3 hours of shared synchronous time per day; everything else is async by default. Balances collaboration and focus.',
+				relevant: ['communication-pattern-1', 'team-formation-1'],
+			},
+			{
+				name: 'Deep work scheduling (Cal Newport)',
+				desc: 'Individual practice: block 4-hour deep-work sessions in your calendar, disable notifications, batch communications into shallow-work windows.',
+				relevant: ['process-fit-attentional-0', 'process-fit-attentional-1'],
+			},
+			{
+				name: 'Working agreements',
+				desc: "Explicit team norms: response time expectations, when it's acceptable to interrupt, what belongs in which channel. Async-first made legible.",
+				relevant: ['communication-pattern-3', 'management-compatibility-2'],
+			},
+			{
+				name: 'GitLab async handbook approach',
+				desc: "Document everything. Decisions in issues, not Slack. Meetings have written agendas and notes. GitLab's handbook is the canonical example.",
+				relevant: ['communication-pattern-2', 'communication-pattern-3'],
+			},
+		],
+		sources: [
+			{
+				author: 'Jason Fried & David Heinemeier Hansson',
+				work: 'Remote: Office Not Required',
+				year: 2013,
+				note: 'Made the case that real-time collaboration is often overrated and that async communication produces better decisions with less interruption.',
+			},
+			{
+				author: 'Cal Newport',
+				work: 'Deep Work: Rules for Focused Success in a Distracted World',
+				year: 2016,
+				note: 'Established the cognitive science case for protecting uninterrupted focus time. Async-first is partly a team-level implementation of Newport\'s individual practice.',
+			},
+			{
+				author: 'Gitlab',
+				work: 'The GitLab Handbook',
+				year: 2022,
+				note: "The most thorough public implementation of async-first work at scale. Every policy, norm, and decision process is documented. Proves the model works for a 2000-person company.",
+			},
+		],
+		growthPaths: {
+			'communication-pattern': [
+				{
+					quadrant: 0,
+					bridge: 'Written-first for one meeting type', // @draft
+					rationale: "Your natural mode is real-time discussion, and async-first asks you to change that wholesale — which is too much at once. Instead, pick one recurring meeting (a weekly status sync, a decision review) and replace it with a written async format for one month. This builds the writing muscle and the team's trust in async before you expand the practice.", // @draft
+					steps: [
+						"Identify the recurring meeting that produces the least value — often a status update that could be a document.", // @draft
+						"Write a template for the async replacement: progress since last time, blockers, decisions needed, next steps. Send it 24 hours before the meeting slot.", // @draft
+						"Cancel the meeting for one sprint. Collect the decisions and actions via written responses instead.", // @draft
+						"Review: did anything important fail to surface? Adjust the template, then expand to another meeting type.", // @draft
+					],
+				},
+			],
+			'process-fit-attentional': [
+				{
+					quadrant: 2,
+					bridge: 'Synthetic async structure', // @draft
+					rationale: "You need external rhythm to sustain momentum — async-first removes the standups and check-ins that provide that rhythm. The solution isn't to resist async, it's to create the structure yourself rather than relying on others to provide it.", // @draft
+					steps: [
+						"Write a personal standup every morning to a private document: what you did yesterday, what you're doing today, one blocker. Do it even when no one reads it.", // @draft
+						"Set a timer for your focus blocks — 90 minutes on, 15 minutes off. The timer is your external rhythm when teammates aren't.", // @draft
+						"At the end of each day, write a brief status note to the team channel. It signals completion and gives you a natural stopping point.", // @draft
+					],
+				},
+			],
+			'team-formation': [
+				{
+					quadrant: 0,
+					bridge: 'Async social infrastructure', // @draft
+					rationale: "Async-first feels isolating when you're highly collaborative by nature. The solution isn't to resist the practice — it's to add deliberate social infrastructure alongside it. Remote-first teams that thrive maintain connection through structured async social channels, not just work channels.", // @draft
+					steps: [
+						"Create a team async social channel with explicit permission to be non-work: wins, links, jokes, weekend plans.", // @draft
+						"Schedule one optional weekly video call with no agenda — a virtual coffee. Attendance is voluntary, presence is the value.", // @draft
+						"For big decisions, add a synchronous review at the end of the async thread: 'We'll discuss this in 30 minutes on Thursday if anyone wants to.' The option reduces the sense that async = no discussion.", // @draft
+					],
+				},
+				{
+					quadrant: 1,
+					bridge: 'Protected sync boundaries', // @draft
+					rationale: "You can sustain async work but prefer the texture of deep collaboration. Async-first works when you negotiate explicit sync exceptions rather than trying to go fully async. The working agreement defines when sync is always allowed, which prevents the feeling that async is a constraint rather than a default.", // @draft
+					steps: [
+						"Agree with your team: sync is always acceptable for (a) blocked/urgent issues, (b) complex technical decisions, (c) onboarding new members.", // @draft
+						"For everything else, write first — 'can we discuss X' becomes a written framing of X that often resolves itself.", // @draft
+						"Keep a weekly 30-minute optional sync for anything that didn't resolve in writing.", // @draft
+					],
+				},
+			],
+			'management-compatibility': [
+				{
+					quadrant: 0,
+					bridge: 'Async accountability rituals', // @draft
+					rationale: "You work best with structure and check-ins. Async-first doesn't remove the need for accountability — it moves it from meetings to written rituals. The key insight is that written rituals can provide the same anchoring function as synchronous ones, with less interruption overhead.", // @draft
+					steps: [
+						"Replace your daily standup with a daily written update: what you finished, what you're doing today, any blockers. Send it at the same time every day.", // @draft
+						"For weekly reviews, write a brief status note on Fridays: progress against goals, decisions made, next week's priorities.", // @draft
+						"Ask your manager or team lead to send written acknowledgement of your updates — even a brief 'looks good' closes the accountability loop.", // @draft
+					],
+				},
+			],
+		},
+		contextModifiers: [
+			{
+				phase: 'greenfield',
+				compassId: 'communication-pattern',
+				quadrant: 2,
+				delta: 0.2,
+				note: 'Greenfield: early projects benefit from async-first norms established from the start — documentation habits formed now persist throughout the project lifecycle.', // @draft
+			},
+			{
+				phase: 'research',
+				compassId: 'process-fit-attentional',
+				quadrant: 0,
+				delta: 0.3,
+				note: 'Research phase: deep, uninterrupted exploration is most valuable in research mode — async-first amplifies the benefit for focus-oriented workers by removing external interruption entirely.', // @draft
+			},
+			{
+				teamSize: 'solo',
+				compassId: 'team-formation',
+				quadrant: 0,
+				delta: 0.3,
+				note: 'Solo: async-first is the only option for solo workers. The practice of writing decisions and updates still applies — the audience is your future self.', // @draft
+			},
+			{
+				teamSize: 'large',
+				compassId: 'communication-pattern',
+				quadrant: 0,
+				delta: 0.3,
+				note: 'Large team: async-first becomes more valuable as team size grows — synchronous communication doesn\'t scale, and the real-time communicator who is natural in a small team finds increasing friction in large ones.', // @draft
+			},
+		],
+	},
+	{
+		id: 'bdd-spec-by-example',
+		name: 'BDD / Specification by Example',
+		brief: 'Write tests as scenarios in plain language. Collaborate with stakeholders on examples. Tests are living documentation.',
+		evaluators: {
+			'comprehension-clarity': {
+				// @draft evaluator text below
+				0: {
+					fit: 'natural',
+					text: "You read holistically and scan for the overall shape before diving in. BDD's plain-language scenarios give you exactly that — a human-readable map of the system's behaviour before you read the implementation. A Gherkin feature file is the kind of high-level overview your comprehension style reaches for first.", // @draft
+				},
+				1: {
+					fit: 'adapt',
+					text: "You trace execution paths step by step. BDD's Given/When/Then structure maps directly to setup/action/assertion — the same mental model you use when reading tests analytically. The plain language is a bonus; the rigour is what fits. Consider using BDD at the acceptance level while keeping unit tests in your preferred format.", // @draft
+				},
+				2: {
+					fit: 'natural',
+					text: "You read widely before reading deeply. BDD's feature files give you the wide view — a catalogue of what the system is supposed to do — before you descend into implementation. This matches your natural reading order perfectly.", // @draft
+				},
+				3: {
+					fit: 'adapt',
+					text: "You pattern-match across the codebase. BDD's consistent scenario structure is a pattern you quickly learn to read — after the first ten scenarios, you scan them as efficiently as code. The value is in the stakeholder collaboration; the format is secondary.", // @draft
+				},
+			},
+			'design-methodology': {
+				0: {
+					fit: 'adapt',
+					text: "You design by emergence. BDD requires specifying behaviour before implementation, which conflicts with your exploratory instinct. Use BDD at the acceptance level only — let the implementation emerge, but specify the observable outcome first via an acceptance scenario.", // @draft
+				},
+				1: {
+					fit: 'natural',
+					text: "You design from contracts and interfaces. BDD scenarios are the ultimate contract — they describe exactly what the system must do, from the user's perspective, before a line of implementation exists. Your interface-first instinct translates directly into scenario-first development.", // @draft
+				},
+				2: {
+					fit: 'adapt',
+					text: "You prototype to explore. BDD is uncomfortable before you understand the domain, but once you do, specifying examples is natural. Use the prototype to explore; then write BDD scenarios before the real implementation. The scenarios prevent you from shipping the prototype.", // @draft
+				},
+				3: {
+					fit: 'friction',
+					text: "You incrementally evolve working code. BDD's upfront specification of examples can feel like premature commitment — you'd rather discover what the system should do by building it. Consider writing scenarios retrospectively (approval testing approach) to capture what emerged, then evolve them forward.", // @draft
+				},
+			},
+			'verification-motivation': {
+				0: {
+					fit: 'friction',
+					text: "You test to verify correctness after implementation. BDD inverts this: the test is written first and serves as a specification, not a verification. The friction is real — writing a test you know will fail before you've built anything goes against your instinct to test what exists. Try: write the scenario immediately after defining the requirement, before designing the solution. The scenario tells you what 'done' looks like.", // @draft
+				},
+				1: {
+					fit: 'natural',
+					text: "You test to express design intent. BDD is the fullest expression of this — the scenario is the design, and the implementation exists to make it pass. Given/When/Then is your design language with an executable backbone.", // @draft
+				},
+				2: {
+					fit: 'natural',
+					text: "You test to prevent regression. BDD's scenarios become the living regression suite — they document what the system does and fail when behaviour changes unexpectedly. This gives you a comprehensive safety net that's also readable by non-technical stakeholders.", // @draft
+				},
+				3: {
+					fit: 'adapt',
+					text: "You test when confidence is needed. BDD's upfront investment in scenario writing is hard to justify for low-risk areas, but the return on critical paths is high — stakeholder-readable tests that serve as living documentation of the most important behaviours. Apply BDD selectively to the paths that matter most.", // @draft
+				},
+			},
+		},
+		alternatives: [
+			{
+				name: 'ATDD (Acceptance Test-Driven Development)',
+				desc: 'Write acceptance tests first without necessarily using Gherkin. Similar collaboration intent, more flexible format.',
+				relevant: ['verification-motivation-1', 'design-methodology-1'],
+			},
+			{
+				name: 'Example mapping (BDD discovery)',
+				desc: 'Structured workshop: define rules, examples, and questions before writing any code or tests. The discovery technique without the Gherkin overhead.',
+				relevant: ['comprehension-clarity-0', 'comprehension-clarity-2'],
+			},
+			{
+				name: 'Property-based testing',
+				desc: "Instead of specific examples, define properties that should always hold. The framework generates hundreds of examples. Complementary to BDD for algorithmic code.",
+				relevant: ['verification-motivation-1', 'design-methodology-1'],
+			},
+			{
+				name: 'Living documentation without Gherkin',
+				desc: 'Approval testing or snapshot testing with descriptive test names. The documentation benefit of BDD without the Given/When/Then structure.',
+				relevant: ['comprehension-clarity-3', 'design-methodology-3'],
+			},
+		],
+		sources: [
+			{
+				author: 'Dan North',
+				work: 'Introducing BDD',
+				year: 2006,
+				note: "Coined the term BDD and described the original insight: replacing 'test' with 'should' changes how developers think about what they're building. The origin of Given/When/Then.",
+			},
+			{
+				author: 'Gojko Adzic',
+				work: 'Specification by Example',
+				year: 2011,
+				note: 'Documented how high-performing agile teams use concrete examples to bridge the gap between business requirements and software implementation. Comprehensive case studies.',
+			},
+			{
+				author: 'Liz Keogh',
+				work: 'BDD is not about testing',
+				year: 2013,
+				note: 'Clarified that BDD is a collaboration and communication technique — the executable tests are a side-effect of shared understanding, not the goal in themselves.',
+			},
+		],
+		growthPaths: {
+			'verification-motivation': [
+				{
+					quadrant: 0,
+					bridge: 'Scenario as definition of done', // @draft
+					rationale: "You test after building to verify correctness. The BDD inversion — test before building — feels backwards, but framing it differently helps: the scenario isn't a test, it's a definition of done. You're not testing something that doesn't exist yet; you're specifying what 'done' means before you start. This is compatible with your verification mindset if you treat the scenario as a requirement artefact, not a test artefact.", // @draft
+					steps: [
+						"For your next feature, before writing any code, write one plain-language scenario: 'Given [starting state], When [action], Then [expected outcome].' Make it concrete — use real values, not generics.", // @draft
+						"Resist the urge to make it a test yet. It's a requirement. Share it with a stakeholder and ask: 'Is this what you mean?' Revise until they agree.", // @draft
+						"Now implement until that scenario passes. When it does, you're done — not when you think the code is correct, but when the scenario passes.", // @draft
+					],
+				},
+			],
+			'design-methodology': [
+				{
+					quadrant: 3,
+					bridge: 'Retrospective scenarios as guards', // @draft
+					rationale: "You evolve working code incrementally, discovering what the system should do by building it. BDD's upfront scenario writing conflicts with this, but the scenarios are still useful after the fact: write them retrospectively to lock in the behaviour you've discovered. Once written, they prevent regression and serve as documentation for the next person.", // @draft
+					steps: [
+						"After a feature is complete and working, write the BDD scenarios for what it does — in plain language, from the user's perspective.", // @draft
+						"Wire the scenarios to automated tests (Cucumber, Playwright describe blocks, or similar).", // @draft
+						"Use the retrospective scenarios as the regression suite going forward — they're now your safety net for future changes.", // @draft
+					],
+				},
+			],
+		},
+		contextModifiers: [
+			{
+				phase: 'greenfield',
+				compassId: 'design-methodology',
+				quadrant: 1,
+				delta: 0.3,
+				note: 'Greenfield: BDD is most powerful at the start of a project when scenarios can drive architecture rather than document it. Scenario-first development on a blank canvas.', // @draft
+			},
+			{
+				phase: 'legacy',
+				compassId: 'verification-motivation',
+				quadrant: 2,
+				delta: 0.2,
+				note: 'Legacy: in a legacy codebase, BDD scenarios written retrospectively provide the regression safety net that missing tests should have provided. Approval-testing existing behaviour is a legitimate starting point.', // @draft
+			},
+			{
+				teamSize: 'solo',
+				compassId: 'comprehension-clarity',
+				quadrant: 0,
+				delta: -0.2,
+				note: 'Solo: BDD\'s stakeholder-collaboration benefit disappears when working alone. The format is still useful for self-documentation, but the overhead is higher relative to the benefit.', // @draft
+			},
+			{
+				teamSize: 'large',
+				compassId: 'comprehension-clarity',
+				quadrant: 0,
+				delta: 0.3,
+				note: 'Large team: BDD pays off most with multiple stakeholders — business analysts, product managers, and developers reading the same scenarios removes the ambiguity that grows with team size.', // @draft
 			},
 		],
 	},

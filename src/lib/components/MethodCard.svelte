@@ -1,8 +1,9 @@
 <script lang="ts">
-	import type { Method, CompassDataMap, ScoredAlternative, ProjectContext } from '$lib/data/types.js';
+	import type { Method, CompassDataMap, ScoredAlternative, ProjectContext, MethodEvaluation, ResolvedInteraction } from '$lib/data/types.js';
 	import { COMPASSES } from '$lib/data/compasses.js';
 	import { evaluateMethod, scoreAlternative } from '$lib/logic/evaluation.js';
 	import { getRelevantGrowthPaths } from '$lib/logic/growth.js';
+	import { getActiveInteractions } from '$lib/logic/interactions.js';
 	import { FIT_META } from '$lib/data/fit-meta.js';
 	import FadeIn from './FadeIn.svelte';
 
@@ -10,9 +11,13 @@
 		method: Method;
 		compassData: CompassDataMap;
 		context?: ProjectContext | null;
+		/** All method evaluations (pre-computed in +page.svelte). Used for interaction display. */
+		evaluations?: Record<string, MethodEvaluation>;
+		/** Method id → name map. Used for interaction display. */
+		methodNames?: Record<string, string>;
 	}
 
-	let { method, compassData, context = null }: Props = $props();
+	let { method, compassData, context = null, evaluations = {}, methodNames = {} }: Props = $props();
 
 	let expanded = $state(false);
 
@@ -30,7 +35,20 @@
 				return { ...alt, score, matchCount, totalRefs };
 			})
 			.filter((alt) => alt.score > 0)
-			.sort((a, b) => b.score - a.score),
+			.sort((a, b) => {
+				// Boost alternatives whose highest-weighted matching compass is at intensity 2
+				const maxIntensity = (relevant: string[]): number =>
+					relevant.reduce((max, ref) => {
+						const lastDash = ref.lastIndexOf('-');
+						const id = ref.substring(0, lastDash);
+						const intensity: number = compassData[id]?.intensity ?? 0;
+						return Math.max(max, intensity);
+					}, 0);
+				const intensityA = maxIntensity(a.relevant);
+				const intensityB = maxIntensity(b.relevant);
+				if (intensityB !== intensityA) return intensityB - intensityA;
+				return b.score - a.score;
+			}),
 	);
 
 	let awaitingCompassTitles = $derived(
@@ -46,6 +64,16 @@
 			compassTitle: COMPASSES.find((c) => c.id === path.compassId)?.title ?? path.compassId,
 		})),
 	);
+
+	// Interactions relevant to this specific method (filtered from global interactions)
+	let methodInteractions = $derived<ResolvedInteraction[]>(
+		Object.keys(evaluations).length > 0
+			? getActiveInteractions(evaluations, methodNames, compassData).filter(
+					(i) => i.methodNames[0] === method.name || i.methodNames[1] === method.name,
+				)
+			: [],
+	);
+	const INTERACTION_ICON: Record<string, string> = { synergy: '⊕', tension: '⊗', redundancy: '≈' };
 </script>
 
 <FadeIn from="left">
@@ -159,6 +187,25 @@
 											<li>{step}</li>
 										{/each}
 									</ol>
+								</div>
+							{/each}
+						</div>
+					</div>
+				{/if}
+
+				{#if methodInteractions.length > 0}
+					<div class="interactions">
+						<div class="section-label">Combines with</div>
+						<div class="interaction-list">
+							{#each methodInteractions as interaction}
+								{@const other = interaction.methodNames[0] === method.name ? interaction.methodNames[1] : interaction.methodNames[0]}
+								<div class="interaction-item" class:synergy={interaction.type === 'synergy'} class:tension={interaction.type === 'tension'} class:redundancy={interaction.type === 'redundancy'}>
+									<div class="interaction-header">
+										<span class="interaction-icon">{INTERACTION_ICON[interaction.type]}</span>
+										<span class="interaction-other">{other}</span>
+										<span class="interaction-type-label">{interaction.type}</span>
+									</div>
+									<p class="interaction-text">{interaction.text}</p>
 								</div>
 							{/each}
 						</div>
@@ -401,7 +448,7 @@
 	.alt-name {
 		font-family: var(--mono);
 		font-size: 12px;
-		color: #ddd;
+		color: var(--text-secondary);
 	}
 
 	.match-label {
@@ -460,7 +507,7 @@
 	.path-bridge {
 		font-family: var(--mono);
 		font-size: 12px;
-		color: #d1fae5;
+		color: var(--fit-natural-text);
 		font-weight: 700;
 	}
 
@@ -475,7 +522,7 @@
 	.path-rationale {
 		font-family: var(--mono);
 		font-size: 11px;
-		color: #9ca3af;
+		color: var(--text-muted);
 		line-height: 1.7;
 		margin: 0 0 8px;
 	}
@@ -514,5 +561,77 @@
 
 	.source-work {
 		font-style: italic;
+	}
+
+	.interaction-list {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+
+	.interaction-item {
+		border-left: 2px solid var(--border);
+		padding: 10px 14px;
+		border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+		background: var(--surface);
+	}
+
+	.interaction-item.synergy {
+		border-left-color: rgba(74, 222, 128, 0.4);
+	}
+
+	.interaction-item.tension {
+		border-left-color: rgba(251, 191, 36, 0.4);
+	}
+
+	.interaction-item.redundancy {
+		border-left-color: rgba(255, 255, 255, 0.15);
+	}
+
+	.interaction-header {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		margin-bottom: 5px;
+		flex-wrap: wrap;
+	}
+
+	.interaction-icon {
+		font-family: var(--mono);
+		font-size: 11px;
+	}
+
+	.interaction-item.synergy .interaction-icon {
+		color: var(--fit-natural);
+	}
+
+	.interaction-item.tension .interaction-icon {
+		color: var(--fit-adapt);
+	}
+
+	.interaction-item.redundancy .interaction-icon {
+		color: var(--text-muted);
+	}
+
+	.interaction-other {
+		font-family: var(--mono);
+		font-size: 11px;
+		color: var(--text-secondary);
+	}
+
+	.interaction-type-label {
+		font-family: var(--mono);
+		font-size: 9px;
+		text-transform: uppercase;
+		letter-spacing: 1px;
+		color: var(--text-faint);
+	}
+
+	.interaction-text {
+		font-family: var(--mono);
+		font-size: 11px;
+		color: var(--text-muted);
+		line-height: 1.7;
+		margin: 0;
 	}
 </style>

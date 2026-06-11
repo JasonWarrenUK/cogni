@@ -44,7 +44,7 @@
 	}
 
 	function getDescColor(index: number): string {
-		if (data.quadrant === index) return '#ddd';
+		if (data.quadrant === index) return 'var(--text-secondary)';
 		if (constraints.conflicts[index]) return 'var(--text-faint)';
 		return 'var(--text-dim)';
 	}
@@ -252,6 +252,57 @@
 
 	.intensity-btn:hover {
 		border-color: var(--border-hover) !important;
+	}
+
+	/* ── Mobile responsive ── */
+	@media (max-width: 640px) {
+		.axis-label {
+			font-size: 9px;
+			letter-spacing: 1px;
+		}
+
+		.axis-left,
+		.axis-right {
+			/* Clip long vertical labels on small screens */
+			font-size: 8px;
+			letter-spacing: 0.5px;
+		}
+
+		.grid-row {
+			gap: 6px;
+		}
+
+		.quad-grid {
+			max-width: 100%;
+			gap: 2px;
+		}
+
+		.quad-button {
+			/* Ensure minimum touch target of 44px */
+			min-height: 44px;
+			padding: 10px 8px;
+		}
+
+		.quad-label {
+			font-size: 10px;
+			letter-spacing: 0;
+		}
+
+		.quad-desc {
+			font-size: 10px;
+		}
+
+		.intensity-buttons {
+			flex-wrap: wrap;
+			justify-content: center;
+			gap: 6px;
+		}
+
+		.intensity-btn {
+			font-size: 9px;
+			padding: 8px 12px;
+			min-height: 40px;
+		}
 	}
 
 </style>
